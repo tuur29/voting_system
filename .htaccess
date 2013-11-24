@@ -1,0 +1,7 @@
+RewriteEngine On
+Options +FollowSymlinks
+
+Rewriterule ^vote$ vote.php
+Rewriterule ^results$ results.php
+Rewriterule ^stem$ vote.php
+Rewriterule ^resultaten$ results.php

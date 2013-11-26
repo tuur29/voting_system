@@ -12,8 +12,16 @@
 	<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico" />
 	
 	<style>
+		html, body { height: 100%; }
 		body { background-color: #fefefe; }
-		.container { margin-top: 50px; }
+		.container {
+			padding-top: 50px;
+			min-height: 100%;
+		}
+		.row{
+			overflow: auto;
+			padding-bottom: 75px;
+		}
 		#count {
 			margin: 5px;
 			margin-left: 20px;
@@ -36,16 +44,11 @@
 		.percent { font-weight: bold; }
 		#graph { height: 300px; }
 		.col-sm-7 { margin-top: 20px; }
-		#buttons {
-			position: absolute;
-			bottom: 20px;
-			left: 20px;
-		}
 		.btn-group { margin-right: 10px; }
 		.col-md-12 {
 			position: relative;
 			z-index: 2;
-			margin: 70px auto 0 auto;
+			margin: 0 auto;
 			max-width: 550px;
 			background: #efefef;
 			border-radius: 10px;
@@ -57,11 +60,20 @@
 		}
 		#resetForm { display: none;	}
 		.alert { margin-top: 50px; }
+		#footer {
+			position: relative;
+			height: 45px;
+			margin: 0 10px;
+			margin-top: -45px;
+			clear: both;
+		}
+		#buttons {
+			float: left;
+		}
 		#credits {
-			position: absolute;
-			right: 10px;
-			bottom: 10px;
+			float: right;
 			font-size: 10px;
+			padding-top: 15px;
 		}
 	</style>
 	
@@ -72,20 +84,23 @@
 <div class="container">
 
 <?php
-	
-	if (!file_exists("round.txt")){
-		if ($_POST['password']==$pass && is_numeric($_POST['reset'])) {
-			$file = 'round.txt';
-			$content = time()."-5";
-			file_put_contents($file,$content, LOCK_EX);
+	if (isset($_GET['success'])){
 ?>
 
-<script>
-	window.location = window.location.href;
-</script>
+	<div class="alert alert-success"><?php echo $SYSTEMRESET ?></div>
 
-<?
-		}else {
+<?php
+	}else if (isset($_GET['error'])){
+?>
+
+	<div class="alert alert-danger"><?php echo $WRONGPASSWORD ?></div>
+
+<?php
+	
+	}
+	
+	if (!file_exists("round.txt")){
+	
 ?>
 
 	<div class="row">
@@ -111,24 +126,13 @@
 			</form>
 		</div>
 	</div>
+	<center><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</center>
 </div>
 
 <?php
-		}
+
 	}else {
-		if (isset($_GET['success'])){
-?>
-
-				<div class="alert alert-success"><?php echo $SYSTEMRESET ?></div>
-
-<?php
-		}else if (isset($_GET['error'])){
-?>
-
-				<div class="alert alert-danger"><?php echo $WRONGPASSWORD ?></div>
-
-<?php
-		}
+	
 ?>
 
 	<div class="row">
@@ -140,29 +144,6 @@
 			
 		</div>
 	</div>
-
-<?php
-	if ($_POST['password']==$pass && is_numeric($_POST['reset'])) {
-		$file = 'round.txt';
-		$content = time()."-".$_POST['reset'];
-		file_put_contents($file, $content, LOCK_EX);
-?>
-	
-	<script>
-	window.location.replace(window.location+"?success");
-	</script>
-	
-<?php
-	}else if ($_POST['password']!="" && $_POST['password']!=$pass){
-?>
-
-	<script>
-	window.location.replace(window.location+"?error");
-	</script>
-	
-<?php
-	}
-?>
 
 	<div class="row" id="resetForm">
 		<div class="col-md-12">
@@ -189,23 +170,26 @@
 	</div>
 </div>
 
-<div id="buttons">
-	<div class="btn-group">
-		<button value="start" class="btn btn-default disabled"><span class="glyphicon glyphicon-play"></span> <?php echo $START ?></button>
-		<button value="stop" class="btn btn-default"><span class="glyphicon glyphicon-pause"></span> <?php echo $PAUSE ?></button>
+<div id="footer">
+	<div id="buttons">
+		<div class="btn-group">
+			<button value="start" class="btn btn-default disabled"><span class="glyphicon glyphicon-play"></span> <?php echo $START ?></button>
+			<button value="stop" class="btn btn-default"><span class="glyphicon glyphicon-pause"></span> <?php echo $PAUSE ?></button>
+		</div>
+		
+		<div class="btn-group dropup">
+			<button type="button" class="btn btn-default dropdown-toggle">
+			<?php echo $GRAPH ?> <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a href="#"><?php echo $PIE ?></a></li>
+				<li><a href="#"><?php echo $CATEGORY ?></a></li>
+			</ul>
+		</div>
+		
+		<button value="reset" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> <?php echo $RESET ?></button>
 	</div>
-	
-	<div class="btn-group dropup">
-		<button type="button" class="btn btn-default dropdown-toggle">
-		<?php echo $GRAPH ?> <span class="caret"></span>
-		</button>
-		<ul class="dropdown-menu">
-			<li><a href="#"><?php echo $PIE ?></a></li>
-			<li><a href="#"><?php echo $CATEGORY ?></a></li>
-		</ul>
-	</div>
-	
-	<button value="reset" class="btn btn-default"><span class="glyphicon glyphicon-repeat"></span> <?php echo $RESET ?></button>
+	<div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
 </div>
 
 <!-- Scripts -->
@@ -239,7 +223,7 @@ $("button").click(function(){
 	}
 });
 
-$("li a").click(function() {
+$("li a").on("mousedown",function() {
 	if ( $(this).html() == "<?php echo $PIE ?>" ){
 		graph = "pie";
 	}else if ( $(this).html() == "<?php echo $CATEGORY ?>" ){
@@ -431,7 +415,36 @@ function assignColor(n) {
 
 <?php
 	}
+	
+	if (isset($_POST['password']) && $_POST['password']==$pass && is_numeric($_POST['reset'])) {
+		$file = 'round.txt';
+		if (isset($_POST['reset'])) {
+			$content = time()."-".$_POST['reset'];
+		}else {
+			$content = time()."-5";
+		}
+		file_put_contents($file, $content, LOCK_EX);
 ?>
-<div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
+	
+	<script>
+		var url = window.location.href;
+		console.log(url);
+		window.location.replace(url.substring(0, url.indexOf('?'))+"?success");
+	</script>
+	
+<?php
+	}else if (isset($_POST['password']) && $_POST['password']!="" && $_POST['password']!=$pass){
+?>
+
+	<script>
+		var url = window.location.href;
+		console.log(url);
+		window.location.replace(url.substring(0, url.indexOf('?'))+"?error");
+	</script>
+	
+<?php
+	}
+?>
+
 </body>
 </html>

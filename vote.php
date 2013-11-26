@@ -88,8 +88,17 @@
 <?php
 	$file = 'round.txt';
 	$id = file_get_contents($file,null,null,null,10);
+	$continue = false;
 	
-	if ( $_COOKIE['id']!=$id ) {
+	if (isset($_COOKIE['id'])) {
+		if ($_COOKIE['id']!=$id) {
+			$continue = true;
+		}
+	}else {
+		$continue = true;
+	}
+	
+	if ( $continue ) {
 		if (isset($_GET['choice'])){
 			$choice = $_GET['choice'];
 			file_put_contents($file, "-".$choice, FILE_APPEND | LOCK_EX);
@@ -206,7 +215,11 @@
 <?php
 		}
 	}else {
-		$choice = $_COOKIE['choice'];
+		if (isset($_COOKIE['choice'])){
+			$choice = $_COOKIE['choice'];
+		}else {
+			$choice = "none";
+		}
 		switch ($choice) {
 			case 1:
 				$color = "red";
@@ -271,7 +284,7 @@
 	}else {
 ?>
 
-<p><?php echo $TRYAGAIN ?></p>
+<p><?php echo $NOTACTIVE ?></p>
 
 <?php
 	}

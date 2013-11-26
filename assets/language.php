@@ -17,6 +17,7 @@ if ($lang == "nl") {
 	$TRYAGAIN = "Fout, probeer opnieuw.";
 	$SEERESULTS = "Bekijk de resultaten.";
 	$CREDITS = "Gemaakt door";
+	$NOTACTIVE = "Er is geen stemming aan de gang.";
 	
 	$RESULTS = "Resultaten";
 	$NUMBERCHOICES = "Aantal keuzes";
@@ -48,6 +49,7 @@ if ($lang == "nl") {
 	$TRYAGAIN = "Error, try again.";
 	$SEERESULTS = "View the results.";
 	$CREDITS = "Made by";
+	$NOTACTIVE = "There is no vote active.";
 	
 	$RESULTS = "Results";
 	$NUMBERCHOICES = "Number of choices";

@@ -275,7 +275,7 @@
 <?php
 	}
 ?>
-<div id="footer"><a href="results.php"><?php echo $SEERESULTS ?></a></div>
+<div id="footer"><a href="<?php echo strtolower($RESULTS) ?>"><?php echo $SEERESULTS ?></a></div>
 <div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
 </body>
 </html>

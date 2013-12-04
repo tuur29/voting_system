@@ -58,7 +58,6 @@
 			text-align: center;
 			cursor: pointer;
 		}
-		#resetForm { display: none;	}
 		.alert { margin-top: 50px; }
 		#footer {
 			position: relative;
@@ -75,6 +74,12 @@
 			font-size: 10px;
 			padding-top: 15px;
 		}
+		#disableBtn { display: none; }
+		
+		<?php if (file_exists($file)){ ?>
+			#resetForm { display: none;	}
+			#disableBtn { display: inline-block; }
+		<?php } ?>
 	</style>
 	
 	<meta name="robots" content="noindex,nofollow" />
@@ -99,39 +104,7 @@
 	
 	}
 	
-	if (!file_exists("round.txt")){
-	
-?>
-
-	<div class="row">
-		<div class="col-md-12">
-			<form class="form-horizontal" action="" method="POST">
-				 <div class="form-group">
-					<label for="reset" class="col-sm-3 control-label"><?php echo $NUMBERCHOICES ?></label>
-					<div class="col-sm-9">
-						<input type="text" name="reset" class="form-control" id="reset" placeholder="1-9">
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="password" class="col-sm-3 control-label"><?php echo $PASSWORD ?></label>
-					<div class="col-sm-9">
-						<input type="password" name="password" class="form-control" id="password" placeholder="<?php echo $PASSWORD ?>">
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" class="btn btn-default"><?php echo $RESET ?></button>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
-	<center><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</center>
-</div>
-
-<?php
-
-	}else {
+	if (file_exists($file)){
 	
 ?>
 
@@ -144,6 +117,12 @@
 			
 		</div>
 	</div>
+
+<?php
+
+	}
+	
+?>
 
 	<div class="row" id="resetForm">
 		<div class="col-md-12">
@@ -163,12 +142,19 @@
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
 						<button type="submit" class="btn btn-default"><?php echo $RESET ?></button>
+						<button id="disableBtn" name="disable" type="submit" class="btn btn-default"><?php echo $DISABLE ?></button>
 					</div>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
+	
+<?php
+
+	if (file_exists($file)){
+
+?>
 
 <div id="footer">
 	<div id="buttons">
@@ -207,9 +193,9 @@ var graph = "cat";
 
 setTimeout(function() {
 	$(".alert").slideUp();
-},2000);
+},1000);
 
-$("button").click(function(){
+$("#buttons button").click(function(){
 	if ($(this).val() == "start"){
 		setLoop();
 		$("button[value=start]").addClass("disabled");
@@ -253,7 +239,7 @@ function setLoop() {
 getData(true);
 function getData(firstTime) {
 	$.ajax({
-		url: "round.txt",
+		url: "<?php echo $file ?>",
 		success:function(result){
 			if (result !=""){
 				if (firstTime) {
@@ -416,13 +402,21 @@ function assignColor(n) {
 <?php
 	}
 	
-	if (isset($_POST['password']) && $_POST['password']==$pass && is_numeric($_POST['reset'])) {
-		$file = 'round.txt';
-		if (isset($_POST['reset'])) {
-			$content = time()."-".$_POST['reset'];
-		}else {
-			$content = time()."-5";
-		}
+	if (isset($_POST['disable']) && isset($_POST['password']) && $_POST['password']==$pass){
+		unlink($file);
+		
+?>
+	
+	<script>
+		var url = window.location.href;
+		console.log(url);
+		window.location.replace(url.substring(0, url.indexOf('?'))+"?success");
+	</script>
+	
+<?php
+		
+	}else if (!isset($_POST['disable']) && isset($_POST['password']) && $_POST['password']==$pass && isset($_POST['reset']) && is_numeric($_POST['reset'])) {
+		$content = time()."-".$_POST['reset'];
 		file_put_contents($file, $content, LOCK_EX);
 ?>
 	
@@ -433,7 +427,7 @@ function assignColor(n) {
 	</script>
 	
 <?php
-	}else if (isset($_POST['password']) && $_POST['password']!="" && $_POST['password']!=$pass){
+	}else if (isset($_POST['password']) && $_POST['password']!=$pass){
 ?>
 
 	<script>

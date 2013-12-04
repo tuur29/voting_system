@@ -23,6 +23,7 @@ if ($lang == "nl") {
 	$NUMBERCHOICES = "Aantal keuzes";
 	$PASSWORD = "Wachtwoord";
 	$RESET = "Resetten";
+	$DISABLE = "Uitschakelen";
 	$TOTALVOTES = "Totaal aantal stemmen";
 	$CHOICEVOTES = "Stemmen per keuze";
 	$SYSTEMRESET = "Het systeem is gereset!";
@@ -55,6 +56,7 @@ if ($lang == "nl") {
 	$NUMBERCHOICES = "Number of choices";
 	$PASSWORD = "Password";
 	$RESET = "Reset";
+	$DISABLE = "Disable";
 	$TOTALVOTES = "Total votes";
 	$CHOICEVOTES = "Votes per choice";
 	$SYSTEMRESET = "System successfully reset!";

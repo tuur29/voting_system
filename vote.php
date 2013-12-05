@@ -60,7 +60,7 @@
 		#credits {
 			position: absolute;
 			right: 10px;
-			bottom: 10px;
+			bottom: 15px;
 			font-size: 10px;
 		}
 		@media (max-width: 970px){
@@ -113,7 +113,7 @@
 	<script>
 		var clicked = false;
 		var id;
-		var nChoices = 5;
+		var nChoices;
 		var choice;
 		var color;
 		$.ajax({
@@ -203,7 +203,7 @@
 				setTimeout(function(){
 					$("h1").animate({
 							'margin-top': '200px'
-					},2000,function() {
+					},1000,function() {
 						$("#footer").slideDown();
 					});
 				},1);
@@ -275,7 +275,13 @@
 <?php
 	}
 ?>
-<div id="footer"><a href="<?php echo strtolower($RESULTS) ?>"><?php echo $SEERESULTS ?></a></div>
+<div id="footer"><a href="<?php 
+		  						if ($seo){
+									echo strtolower($RESULTS);
+								 }else {
+									echo "results.php";
+								}
+?>"><?php echo $SEERESULTS ?></a></div>
 <div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
 </body>
 </html>

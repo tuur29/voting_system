@@ -188,8 +188,11 @@ function Init(){
 				for (var i=0; i<nChoices.length; i++){
 					$("#questionsDrop").append("<li><a href='#' id='q"+(i+1)+"'><?php echo $QUESTION ?> "+(i+1));
 				}
+				$("#questionsDrop").parents(".btn-group").show();
+				$(".row h3:first").show();
 			}else {
-				$("#questionsDrop").parents(".btn-group").remove();
+				$("#questionsDrop").parents(".btn-group").hide();
+				$(".row h3:first").hide();
 			}
 			
 			getData();

@@ -1,4 +1,5 @@
 <?php
+	ob_start();
 	include_once("options.php");
 	include_once("assets/language.php");
 	if (is_dir($folder) && file_exists($folder."/round.txt")){
@@ -7,7 +8,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title><?php echo $MAKECHOICE ?></title>
+	<title><?php echo $VOTING ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
 	<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico" />
@@ -113,30 +114,30 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<?php if (isset($_GET['question'])) $question = $_GET['question']; else $question = 1; ?>
-<h1><?php echo $QUESTION." ".$question ?></h1>
+<?php if (isset($_GET['question'])) $q = $_GET['question']; else $q = 1; ?>
+<h1><?php echo $QUESTION." ".$q ?></h1>
 <?php
 	$id = file_get_contents($folder."/round.txt",null,null,null,10);
-	$nChoices = split("-", file_get_contents($folder."/round.txt",null,null,11) );
+	$nChoices = explode("-", file_get_contents($folder."/round.txt",null,null,11) );
 	$allDone = true;
 	
 	if (isset($_COOKIE[$id])) {
 		$votes = explode("-",$_COOKIE[$id]);
-		if (count($votes) < count($nChoices) && count($votes)!=$question ) {
+		if (count($votes) < count($nChoices) && count($votes)!=$q ) {
 			$allDone = false;
 		}else if (!isset($_GET['question']) && count($votes) < count($nChoices)){
 			$allDone = false;
 		}
 	}else {
-		$votes = [];
+		$votes = array();
 		$allDone = false;
 	}
 	
 	if ( !$allDone ) {
 		if (isset($_GET['question']) && isset($_GET['choice'])){
-			file_put_contents($folder."/".$question.".txt", "-".$_GET['choice'], FILE_APPEND | LOCK_EX);
+			file_put_contents($folder."/".$q.".txt", "-".$_GET['choice'], FILE_APPEND | LOCK_EX);
 			array_push($votes,$_GET['choice']);
-			setcookie($id,implode("-",$votes));
+			setcookie($id,implode("-",$votes),time()+259200);
 		}else {
 ?>
 <div class="container"></div>
@@ -254,4 +255,5 @@
 	}else {
 		echo "<html><body><p>".$NOTACTIVE."</p></body></html>";
 	}
+	ob_flush();
 ?>

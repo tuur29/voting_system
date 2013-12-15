@@ -9,7 +9,7 @@ HOW TO USE:
   3. Go to /reset and make a new round.
   4. Go to /vote to vote! (or root)
   5. See the results in real-time at /results (on another device perhaps?)
-
+  
 HOW IT WORKS:
   When you first start the script, it will ask you to make a new session.
   A folder is made in the same directory. It contains a round.txt file and a bunch of other files.
@@ -27,3 +27,4 @@ HOW IT WORKS:
   To disable the script go to results.php and press "reset" at the bottom of the page.
   Fill in the password (leave the rest empty) and press "Disable". To reset the script,
   fill all options and press "Reset".
+  

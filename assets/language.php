@@ -15,7 +15,7 @@ if ($lang == "nl") {
 	$NOTACTIVE = "Er is geen stemming aan de gang.";
 	$QUESTION = "Vraag";
 	$ERROR = "Er is een fout opgetreden!";
-	$MAKECHOICE = "Maak je keuze";
+	$VOTING = "Stemmen";
 	$VOTED = "Je stemde op";
 	$AGAIN = "Opnieuw";
 	$SEERESULTS = "Bekijk de resultaten";	
@@ -52,7 +52,7 @@ if ($lang == "nl") {
 	$QUESTION = "Question";
 	$ERROR = "An error has occured!";
 		//vote.php
-	$MAKECHOICE = "Make your choice";
+	$VOTING = "Voting";
 	$VOTED = "You voted for";
 	$AGAIN = "Retry";
 	$SEERESULTS = "View the results";

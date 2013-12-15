@@ -13,7 +13,6 @@ Rewriterule ^stem$ vote.php
 Rewriterule ^resultaten$ results.php
 # same reset rule as EN
 
-
 	#Files Caching
 <FilesMatch "\.(css|js|php)$">
 Header set Cache-Control "max-age=29030400, public"
@@ -21,7 +20,7 @@ Header set Cache-Control "max-age=29030400, public"
 <FilesMatch "\.(jpg|png|gif|ico|ttf|woff)$">
 Header set Cache-Control "max-age=29030400, public"
 </FilesMatch>
-<FilesMatch "round.txt">
+<FilesMatch "\.txt">
 FileETag None
 <ifModule mod_headers.c>
 Header unset ETag

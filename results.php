@@ -1,6 +1,7 @@
 <?php
 	include_once("options.php");
 	include_once("assets/language.php");
+	if (is_dir($folder) && file_exists($folder."/round.txt")){
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -73,13 +74,6 @@
 </head>
 <body>
 <div class="container">
-
-<?php
-	
-	if (is_dir($folder) && file_exists($folder."/round.txt")){
-	
-?>
-
 	<div class="row">
 		<div class="col-sm-5">
 			<h3></h3>
@@ -158,7 +152,7 @@ var nChoices;
 var question = 1;
 var folder = "<?php if (isset($_GET['round'])) echo $_GET['round']; else echo $folder; ?>";
 
-if (window.location.hash && !isNaN(window.location.hash.substring(1))){
+if (window.location.hash && !isNaN(window.location.hash.substring(1)) && window.location.hash.substring(1) != ""){
 	var question = window.location.hash.substring(1);
 }
 $(window).resize(function(){ hideLabels(); });
@@ -267,8 +261,8 @@ function getData() {
 					series: {
 						bars: { 
 							show: true,
-							barWidth: 1,
-							fill: 0.8
+							barWidth: 0.8,
+							fill: 1
 						}
 					},
 					legend: { show: false },
@@ -371,7 +365,7 @@ $(".dropdown-toggle").focusout(function() {
 	
 <?php
 	}else {
-		echo "<html><body><p>".$NOTACTIVE."</p></body></html>";
+		echo "<html><body><p>".$NOTACTIVE."</p>";
 	}
 ?>
 

@@ -1,6 +1,6 @@
 <?php
 	$pass = "pass";
 	$lang = "nl";
-	$file = 'round.txt';
-	$seo = true;	//enabled htaccess?
+	$folder = 'round';
+	$seo = true;	//Have apache and enabled mod_rewrite?
 ?>

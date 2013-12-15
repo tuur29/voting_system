@@ -2,10 +2,16 @@ RewriteEngine On
 Options +FollowSymlinks
 
 Rewriterule ^$ vote.php
+
+	#EN
 Rewriterule ^vote$ vote.php
 Rewriterule ^results$ results.php
+Rewriterule ^reset$ reset.php
+
+	#NL
 Rewriterule ^stem$ vote.php
 Rewriterule ^resultaten$ results.php
+# same reset rule as EN
 
 
 	#Files Caching

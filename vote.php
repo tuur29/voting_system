@@ -1,7 +1,7 @@
 <?php
 	include_once("options.php");
 	include_once("assets/language.php");
-	if (file_exists("round.txt")){
+	if (is_dir($folder) && file_exists($folder."/round.txt")){
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -17,19 +17,20 @@
 			text-align: center;
 			margin-top: 50px;
 		}
-		.container { margin-top: 70px; }
+		.container { margin-top: 60px; }
 		.button {
 			display: block;
 			background-position: center center;
 			background-size: 100% 100%;
 			background-repeat: no-repeat;
-			background-image: url('assets/white.png');
+			background-image: url('assets/buttons/white.png');
 			margin: 0 auto;
 			width: 128px;
 			height: 128px;
 			position: relative;
 			cursor: pointer;
 		}
+		button { display: none; }
 		.button#b1{ background-image: url('assets/buttons/red.png'); }
 		.button#b2{ background-image: url('assets/buttons/blue.png'); }
 		.button#b3{ background-image: url('assets/buttons/yellow.png'); }
@@ -39,7 +40,7 @@
 		.button#b7{ background-image: url('assets/buttons/orange.png'); }
 		.button#b8{ background-image: url('assets/buttons/cyan.png'); }
 		.button#b9{ background-image: url('assets/buttons/white.png'); }
-		button { display: none; }
+		h1 .label { margin: 100px 5px; }
 		.label-red { background-color: #FF0A0A; }
 		.label-blue { background-color: #235BF3; }
 		.label-yellow { background-color: #FFDB0A; }
@@ -52,161 +53,162 @@
 		#footer {
 			position: absolute;
 			right: 0;
-			bottom: 10px;
+			bottom: 15px;
+			display: none;
 			left: 0;
 			text-align: center;
-			display: none;
+			font-size: 18px;
 		}
+		#footer a { margin: 0 10px }
 		#credits {
 			position: absolute;
 			right: 10px;
-			bottom: 15px;
+			bottom: 10px;
 			font-size: 10px;
 		}
 		@media (max-width: 970px){
 			.container { margin-top: 0px; }
-			.row div:not(.col-md-1) {
-				margin-top: 30px;
-			}
-			h1 {
-				margin: 20px 0 0px 0;
-			}
+			h1 { margin: 20px 0 0px 0; }
 			.button {
 				width: 64px;
 				height: 64px;
-				margin-top: 20px;
+				margin-top: 10px;
 			}
 		}
 	</style>
-	
+	<script>
+		function defineVars(n){
+			switch(Number(n)){
+				case 1:
+					return ["red","<?php echo $RED ?>"];
+					break;
+				case 2:
+					return ["blue","<?php echo $BLUE ?>"];
+					break;
+				case 3:
+					return ["yellow","<?php echo $YELLOW ?>"];
+					break;
+				case 4:
+					return ["green","<?php echo $GREEN ?>"];
+					break;
+				case 5:
+					return ["black","<?php echo $BLACK ?>"];
+					break;
+				case 6:
+					return ["pink","<?php echo $PINK ?>"];
+					break;
+				case 7:
+					return ["orange","<?php echo $ORANGE ?>"];
+					break;
+				case 8:
+					return ["cyan","<?php echo $CYAN ?>"];
+					break;
+				default:
+					return ["white","<?php echo $WHITE ?>"];
+					break;
+			}
+		}
+	</script>
 	<meta name="robots" content="noindex,nofollow" />
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<h1><?php echo $MAKECHOICE ?></h1>
-
+<?php if (isset($_GET['question'])) $question = $_GET['question']; else $question = 1; ?>
+<h1><?php echo $QUESTION." ".$question ?></h1>
 <?php
-	$file = 'round.txt';
-	$id = file_get_contents($file,null,null,null,10);
-	$continue = false;
+	$id = file_get_contents($folder."/round.txt",null,null,null,10);
+	$nChoices = split("-", file_get_contents($folder."/round.txt",null,null,11) );
+	$allDone = true;
 	
-	if (isset($_COOKIE['id'])) {
-		if ($_COOKIE['id']!=$id) {
-			$continue = true;
+	if (isset($_COOKIE[$id])) {
+		$votes = explode("-",$_COOKIE[$id]);
+		if (count($votes) < count($nChoices) && count($votes)!=$question ) {
+			$allDone = false;
+		}else if (!isset($_GET['question']) && count($votes) < count($nChoices)){
+			$allDone = false;
 		}
 	}else {
-		$continue = true;
+		$votes = [];
+		$allDone = false;
 	}
 	
-	if ( $continue ) {
-		if (isset($_GET['choice'])){
-			$choice = $_GET['choice'];
-			file_put_contents($file, "-".$choice, FILE_APPEND | LOCK_EX);
+	if ( !$allDone ) {
+		if (isset($_GET['question']) && isset($_GET['choice'])){
+			file_put_contents($folder."/".$question.".txt", "-".$_GET['choice'], FILE_APPEND | LOCK_EX);
+			array_push($votes,$_GET['choice']);
+			setcookie($id,implode("-",$votes));
 		}else {
 ?>
-
 <div class="container"></div>
 
 	<!-- Scripts -->
 	<script src="assets/jquery-1.10.2.min.js"></script>
-	<script src="assets/jquery.cookie.js"></script>
 	<script>
 		var clicked = false;
-		var id;
-		var nChoices;
-		var choice;
-		var color;
-		$.ajax({
-			url: "round.txt",
-			success:function(result){
-				id = result.substr(0,10);
-				result = result.substr(11);
-				nChoices = result.charAt(0);
-				result = result.substr(2);
-				var col = Math.floor(12/ nChoices );
-				for (var i=0; i<nChoices; i++){
-					$(".container").append( '<div class="col-md-'+col+'"><div id="b'+(i+1)+'" class="button"><button value="'+(i+1)+'">'+(i+1)+'</button></div></div>' );
-				}
-
-				if (col*nChoices != 12){
-					$(".container").append('<div class="col-md-1"></div>');
-					$(".container").prepend('<div class="col-md-1"></div>');
-				}
-				
-				$(".button").click(function() {
-					if (!clicked) {
-						clicked = true;
-						choice = $(this).children("button").val();
-						$.ajax({
-							url: "vote.php",
-							data: "choice="+choice,
-							success:function(){
-								$.cookie('choice', choice, { expires: 1 });
-								$.cookie('id', id, { expires: 1 });
-								switch(Number(choice)){
-									case 1:
-										color = "red";
-										choice = "<?php echo $RED ?>";
-										break;
-									case 2:
-										color = "blue";
-										choice = "<?php echo $BLUE ?>";
-										break;
-									case 3:
-										color = "yellow";
-										choice = "<?php echo $YELLOW ?>";
-										break;
-									case 4:
-										color = "green";
-										choice = "<?php echo $GREEN ?>";
-										break;
-									case 5:
-										color = "black";
-										choice = "<?php echo $BLACK ?>";
-										break;
-									case 6:
-										color = "pink";
-										choice = "<?php echo $PINK ?>";
-										break;
-									case 7:
-										color = "orange";
-										choice = "<?php echo $ORANGE ?>";;
-										break;
-									case 8:
-										color = "cyan";
-										choice = "<?php echo $CYAN ?>";
-										break;
-									default:
-										color = "white";
-										choice = "<?php echo $WHITE ?>";
-										break;
-								}
-								hide("<?php echo $VOTED1 ?> <span class='label label-"+color+"'>"+choice+"</span><?php echo $VOTED2; ?>");
-							},
-							error:function(){
-								$("#footer").html("<a href=''><?php echo $AGAIN ?></a>");
-								hide("<?php echo $TRYAGAIN ?><br/>");
-							},
-						});
+		var id = <?php echo $id ?>;
+		var nChoices = <?php echo json_encode($nChoices) ?>;
+		var questions = nChoices.length;
+		var question = <?php echo count($votes)+1 ?>;
+		var votes = <?php echo json_encode($votes) ?>;
+		
+		for (var i=0; i<questions; i++){
+			var col = Math.floor(12/ nChoices[i] );
+			$(".container").append( '<div class="row" id="q'+(i+1)+'">');
+			
+			for (var n=0; n<nChoices[i]; n++){
+				$(".container #q"+(i+1)).append( '<div class="col-md-'+col+'"><div id="b'+(n+1)+'" class="button"><button value="'+(n+1)+'">'+(n+1)+'</button></div></div>' );
+			}
+			if (col*nChoices[i] != 12){
+				$(".container #q"+(i+1)).prepend('<div class="col-md-1"></div>');
+				$(".container #q"+(i+1)).append('<div class="col-md-1"></div>');
+			}
+		}
+		
+		$(".row").each(function(){
+			$(this).css("display","none");
+		});
+		$("#q"+question).css("display","block");
+		$("h1").html("<?php echo $QUESTION ?> "+ question );
+		
+		$(".row .button").click(function() {
+			if (!clicked) {
+				clicked = true;
+				var choice = $(this).children("button").val();
+				question = $(this).children("button").parents(".row").attr('id').substring(1);
+				$.ajax({
+					type: "GET",
+					url: "vote.php",
+					data: "question="+question+"&choice="+choice,
+					success: function(){
+						votes.push(choice);
+						nextQuestion(question);
 					}
 				});
-			
-			},
-			error:function(error){
-				$("html").append("<p><?php echo $TRYAGAIN ?></p>");
-			},
-		 });
+			}
+		});
 		
-		function hide(text) {
-			$(".button").fadeOut(function() {
-				$("h1").html(text);
-				setTimeout(function(){
-					$("h1").animate({
+		function nextQuestion(q) {
+			$("#q"+q).fadeOut(function() {
+				if (q<questions){
+					$("h1").html("<?php echo $QUESTION ?> "+ (Number(q)+1) );
+					$("#q"+ (Number(q)+1) ).fadeIn();
+					clicked = false;
+				}else {
+					var vars = [];
+					
+					$("h1").html("<?php echo $VOTED ?>:<br/>");
+					for (var i=0; i<votes.length; i++) {
+						$("h1").append("<span class='label label-"+defineVars(votes[i])[0]+"'>"+defineVars(votes[i])[1]+"</span>");
+					}
+					
+					setTimeout(function(){
+						$("h1").animate({
 							'margin-top': '200px'
-					},1000,function() {
-						$("#footer").slideDown();
-					});
-				},1);
+						},1000,function() {
+							$("#footer").slideDown();
+						});
+					},1);
+				}
 			});
 		}
 		
@@ -215,83 +217,41 @@
 <?php
 		}
 	}else {
-		if (isset($_COOKIE['choice'])){
-			$choice = $_COOKIE['choice'];
-		}else {
-			$choice = "none";
-		}
-		switch ($choice) {
-			case 1:
-				$color = "red";
-				$choice = $RED;
-				break;
-			case 2:
-				$color = "blue";
-				$choice = $BLUE;
-				break;
-			case 3:
-				$color = "yellow";
-				$choice = $YELLOW;
-				break;
-			case 4:
-				$color = "green";
-				$choice = $GREEN;
-				break;
-			case 5:
-				$color = "black";
-				$choice = $BLACK;
-				break;
-			case 6:
-				$color = "pink";
-				$choice = $PINK;
-				break;
-			case 7:
-				$color = "orange";
-				$choice = $ORANGE;
-				break;
-			case 8:
-				$color = "cyan";
-				$choice = $CYAN;
-				break;
-			default:
-				$color = "white";
-				$choice = $WHITE;
-				break;
-		}
 
 ?>
 	<script src="assets/jquery-1.10.2.min.js"></script>
 	<script>
-
-		$("h1").html("<?php echo $VOTED1 ?> <span class='label label-<?php echo $color ?>'><?php echo $choice ?></span> <?php echo $VOTED2; ?>");
+		
+		var votes = <?php echo json_encode($votes) ?>;
+		$("h1").html("<?php echo $VOTED ?>:<br/>");
+		for (var i=0; i<votes.length; i++) {
+			$("h1").append("<span class='label label-"+defineVars(votes[i])[0]+"'>"+defineVars(votes[i])[1]+"</span> ");
+		}
+		
 		$("h1").css({
 			'margin-top': '200px'
 		});
 		setTimeout(function(){
-			$("#footer").slideDown();
-		},500);
+			$("#footer").css("display","block");
+		},50);
 		
 	</script>
 <?php
 	}
 ?>
-<div id="footer"><a href="<?php 
-		  						if ($seo){
-									echo strtolower($RESULTS);
-								 }else {
-									echo "results.php";
-								}
-?>"><?php echo $SEERESULTS ?></a></div>
+<div id="footer"><?php 
+					if ($seo){
+						echo "<a class='btn btn-default' href='".strtolower($RESULTS)."'>".$SEERESULTS."</a>";
+					}else {
+						echo "<a class='btn btn-default' href='results.php'>".$SEERESULTS."</a>";
+					}
+?></div>
 <div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
 </body>
 </html>
 
 <?php
 	}else {
-?>
-
-<p><?php echo $NOTACTIVE ?></p>
-
-<?php
+		echo "<html><body><p>".$NOTACTIVE."</p></body></html>";
 	}
 ?>

@@ -1,7 +1,6 @@
 <?php
 
 if ($lang == "nl") {
-	$MAKECHOICE = "Maak je keuze";
 	$RED = "Rood";
 	$BLUE = "Blauw";
 	$YELLOW = "Geel";
@@ -11,30 +10,33 @@ if ($lang == "nl") {
 	$ORANGE = "Oranje";
 	$CYAN = "Cyaan";
 	$WHITE = "Wit";
-	$VOTED1 = "Je hebt op";
-	$VOTED2 = " gestemd.";
-	$AGAIN = "Opnieuw";
 	$TRYAGAIN = "Fout, probeer opnieuw.";
-	$SEERESULTS = "Bekijk de resultaten.";
 	$CREDITS = "Gemaakt door";
 	$NOTACTIVE = "Er is geen stemming aan de gang.";
-	
+	$QUESTION = "Vraag";
+	$ERROR = "Er is een fout opgetreden!";
+	$MAKECHOICE = "Maak je keuze";
+	$VOTED = "Je stemde op";
+	$AGAIN = "Opnieuw";
+	$SEERESULTS = "Bekijk de resultaten";	
 	$RESULTS = "Resultaten";
-	$NUMBERCHOICES = "Aantal keuzes";
-	$PASSWORD = "Wachtwoord";
-	$RESET = "Resetten";
-	$DISABLE = "Uitschakelen";
+	$KEEPFOLDER = "Bewaar ronde";
 	$TOTALVOTES = "Totaal aantal stemmen";
 	$CHOICEVOTES = "Stemmen per keuze";
-	$SYSTEMRESET = "Het systeem is gereset!";
-	$WRONGPASSWORD = "Verkeerd wachtwoord!";
 	$START = "Start";
 	$PAUSE = "Pauze";
 	$GRAPH = "Grafiek";
 	$PIE = "Taartdiagram";
 	$CATEGORY = "Staafdiagram";
+	$ROUND = "Ronde";
+	$NUMBERCHOICES = "Aantal keuzes";
+	$NUMBERQUESTIONS = "Aantal vragen";
+	$PASSWORD = "Wachtwoord";
+	$RESET = "Resetten";
+	$DISABLE = "Uitschakelen";
+	$SYSTEMRESET = "Het systeem is gereset!";
 }else {
-	$MAKECHOICE = "Make your choice";
+		//General
 	$RED = "Red";
 	$BLUE = "Blue";
 	$YELLOW = "Yellow";
@@ -44,28 +46,34 @@ if ($lang == "nl") {
 	$ORANGE = "Orange";
 	$CYAN = "Cyan";
 	$WHITE = "White";
-	$VOTED1 = "You voted for";
-	$VOTED2 = ".";
-	$AGAIN = "Retry";
 	$TRYAGAIN = "Error, try again.";
-	$SEERESULTS = "View the results.";
 	$CREDITS = "Made by";
 	$NOTACTIVE = "There is no vote active.";
-	
-	$RESULTS = "Results";
+	$QUESTION = "Question";
+	$ERROR = "An error has occured!";
+		//vote.php
+	$MAKECHOICE = "Make your choice";
+	$VOTED = "You voted for";
+	$AGAIN = "Retry";
+	$SEERESULTS = "View the results";
+		//results.php
+	$RESULTS = "Results";	//make a htaccess rewrite rule with the same content (lowercase & no spaces) & add one for "/vote"
 	$NUMBERCHOICES = "Number of choices";
-	$PASSWORD = "Password";
-	$RESET = "Reset";
-	$DISABLE = "Disable";
-	$TOTALVOTES = "Total votes";
-	$CHOICEVOTES = "Votes per choice";
-	$SYSTEMRESET = "System successfully reset!";
-	$WRONGPASSWORD = "Wrong password!";
+	$NUMBERQUESTIONS = "Number of questions";
 	$START = "Start";
 	$PAUSE = "Pause";
 	$GRAPH = "Graph";
 	$PIE = "Pie chart";
 	$CATEGORY = "Bar graph";
+	$ROUND = "Round";
+		//reset.php
+	$PASSWORD = "Password";
+	$RESET = "Reset";
+	$DISABLE = "Disable";
+	$KEEPFOLDER = "Keep round";
+	$TOTALVOTES = "Total votes";
+	$CHOICEVOTES = "Votes per choice";
+	$SYSTEMRESET = "System successfully reset!";
 }
 
 ?>

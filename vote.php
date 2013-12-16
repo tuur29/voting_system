@@ -114,7 +114,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<?php if (isset($_GET['question'])) $q = $_GET['question']; else $q = 1; ?>
+<?php if (isset($_POST['question'])) $q = $_POST['question']; else $q = 1; ?>
 <h1><?php echo $QUESTION." ".$q ?></h1>
 <?php
 	$id = file_get_contents($folder."/round.txt",null,null,null,10);
@@ -125,7 +125,7 @@
 		$votes = explode("-",$_COOKIE[$id]);
 		if (count($votes) < count($nChoices) && count($votes)!=$q ) {
 			$allDone = false;
-		}else if (!isset($_GET['question']) && count($votes) < count($nChoices)){
+		}else if (!isset($_POST['question']) && count($votes) < count($nChoices)){
 			$allDone = false;
 		}
 	}else {
@@ -134,9 +134,9 @@
 	}
 	
 	if ( !$allDone ) {
-		if (isset($_GET['question']) && isset($_GET['choice'])){
-			file_put_contents($folder."/".$q.".txt", "-".$_GET['choice'], FILE_APPEND | LOCK_EX);
-			array_push($votes,$_GET['choice']);
+		if (isset($_POST['question']) && isset($_POST['choice'])){
+			file_put_contents($folder."/".$q.".txt", "-".$_POST['choice'], FILE_APPEND | LOCK_EX);
+			array_push($votes,$_POST['choice']);
 			setcookie($id,implode("-",$votes),time()+259200);
 		}else {
 ?>
@@ -177,7 +177,7 @@
 				var choice = $(this).children("button").val();
 				question = $(this).children("button").parents(".row").attr('id').substring(1);
 				$.ajax({
-					type: "GET",
+					type: "POST",
 					url: "vote.php",
 					data: "question="+question+"&choice="+choice,
 					success: function(){

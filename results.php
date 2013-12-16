@@ -76,7 +76,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-sm-5">
-			<h3></h3>
+			<h3 id="questionCount"></h3>
 			<h4><?php echo $TOTALVOTES ?>:</h4><h3 id="count">0</h3>
 			<h4><?php echo $CHOICEVOTES ?>:</h4><table></table>
 		</div>
@@ -166,7 +166,7 @@ function hideLabels(){
 	}
 }
 	
-$(".row h3").html("<?php echo $QUESTION ?> "+question);
+$("#questionCount").html("<?php echo $QUESTION ?>"+" "+question);
 
 Init();
 function Init(){
@@ -183,10 +183,10 @@ function Init(){
 					$("#questionsDrop").append("<li><a href='#' id='q"+(i+1)+"'><?php echo $QUESTION ?> "+(i+1));
 				}
 				$("#questionsDrop").parents(".btn-group").show();
-				$(".row h3:first").show();
+				$("#questionCount").show();
 			}else {
 				$("#questionsDrop").parents(".btn-group").hide();
-				$(".row h3:first").hide();
+				$("#questionCount").hide();
 			}
 			
 			getData();
@@ -195,7 +195,7 @@ function Init(){
 				if ( $(this).parents('.dropdown-menu').attr('id') == "questionsDrop" ){
 					question = $(this).attr('id').substring(1);
 					window.location.hash = question;
-					$(".row h3").html("<?php echo $QUESTION ?> "+question);
+					$("#questionCount").html("<?php echo $QUESTION ?> "+question);
 					getData();
 				}
 			});

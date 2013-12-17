@@ -28,3 +28,8 @@ HOW IT WORKS:
   Fill in the password (leave the rest empty) and press "Disable". To reset the script,
   fill all options and press "Reset".
   
+COMPATIBILITY
+  You can vote with all browsers! It looks like it should on modern ones (IE9, Chome, Firefox, Safari, Opera),
+  but even people with IE5 are able to cast a vote (it doesn't look pretty, but hey it works).
+  Viewing the results however is only availible on modern browsers (see Jquery's compatibility for a list).
+  

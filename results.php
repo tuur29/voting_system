@@ -11,7 +11,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
 	<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico" />
-	
 	<style>
 		html, body { height: 100%; }
 		body { background-color: #fefefe; }

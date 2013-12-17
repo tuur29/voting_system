@@ -2,7 +2,31 @@
 	ob_start();
 	include_once("options.php");
 	include_once("assets/language.php");
+	
 	if (is_dir($folder) && file_exists($folder."/round.txt")){
+		if (isset($_POST['question'])) $q = $_POST['question']; else $q = 1;
+		$id = file_get_contents($folder."/round.txt",null,null,null,10);
+		$nChoices = explode("-", file_get_contents($folder."/round.txt",null,null,11) );
+		$allDone = true;
+		
+		if (isset($_COOKIE[$id])) {
+			$votes = explode("-",$_COOKIE[$id]);
+			if (count($votes) < count($nChoices) && count($votes)!=$q ) {
+				$allDone = false;
+			}else if (!isset($_POST['question']) && count($votes) < count($nChoices)){
+				$allDone = false;
+			}
+		}else {
+			$votes = array();
+			$allDone = false;
+		}
+		
+		if ( !$allDone ) {
+			if (isset($_POST['question']) && isset($_POST['choice'])){
+				file_put_contents($folder."/".$q.".txt", "-".$_POST['choice'], FILE_APPEND | LOCK_EX);
+				array_push($votes,$_POST['choice']);
+				setcookie($id,implode("-",$votes),time()+259200);
+			}else {
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -114,32 +138,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<?php if (isset($_POST['question'])) $q = $_POST['question']; else $q = 1; ?>
 <h1><?php echo $QUESTION." ".$q ?></h1>
-<?php
-	$id = file_get_contents($folder."/round.txt",null,null,null,10);
-	$nChoices = explode("-", file_get_contents($folder."/round.txt",null,null,11) );
-	$allDone = true;
-	
-	if (isset($_COOKIE[$id])) {
-		$votes = explode("-",$_COOKIE[$id]);
-		if (count($votes) < count($nChoices) && count($votes)!=$q ) {
-			$allDone = false;
-		}else if (!isset($_POST['question']) && count($votes) < count($nChoices)){
-			$allDone = false;
-		}
-	}else {
-		$votes = array();
-		$allDone = false;
-	}
-	
-	if ( !$allDone ) {
-		if (isset($_POST['question']) && isset($_POST['choice'])){
-			file_put_contents($folder."/".$q.".txt", "-".$_POST['choice'], FILE_APPEND | LOCK_EX);
-			array_push($votes,$_POST['choice']);
-			setcookie($id,implode("-",$votes),time()+259200);
-		}else {
-?>
 <div class="container"></div>
 
 	<!-- Scripts -->
@@ -216,9 +215,8 @@
 	</script>
 
 <?php
-		}
-	}else {
-
+			}
+		}else {
 ?>
 	<script src="assets/jquery-1.10.2.min.js"></script>
 	<script>
@@ -238,7 +236,7 @@
 		
 	</script>
 <?php
-	}
+		}
 ?>
 <div id="footer"><?php 
 					if ($seo){

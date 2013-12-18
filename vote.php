@@ -34,8 +34,14 @@
 <head>
 	<title><?php echo $VOTING ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
 	<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico" />
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries-->
+    <!--[if lt IE 9]>
+    <script src="assets/html5shiv.js"></script>
+    <script src="assets/respond.min.js"></script>
+    <![endif]-->
 	<style>
 		body { background-color: #fefefe; }
 		h1 {

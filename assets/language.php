@@ -35,7 +35,42 @@ if ($lang == "nl") {
 	$RESET = "Resetten";
 	$DISABLE = "Uitschakelen";
 	$SYSTEMRESET = "Het systeem is gereset!";
-}else {
+} else if ($lang == "???") {							// Add your own language here!
+	$RED = "Red";
+	$BLUE = "Blue";
+	$YELLOW = "Yellow";
+	$GREEN = "Green";
+	$BLACK = "Black";
+	$PINK = "Pink";
+	$ORANGE = "Orange";
+	$CYAN = "Cyan";
+	$WHITE = "White";
+	$TRYAGAIN = "Error, try again.";
+	$CREDITS = "Made by";
+	$NOTACTIVE = "There is no vote active.";
+	$QUESTION = "Question";
+	$ERROR = "An error has occured!";
+	$VOTING = "Voting";
+	$VOTED = "You voted for";
+	$AGAIN = "Retry";
+	$SEERESULTS = "View the results";
+	$RESULTS = "Results";	//make a htaccess rewrite rule with the same content (lowercase & no spaces) & add one for "/vote"
+	$NUMBERCHOICES = "Number of choices";
+	$NUMBERQUESTIONS = "Number of questions";
+	$START = "Start";
+	$PAUSE = "Pause";
+	$GRAPH = "Graph";
+	$PIE = "Pie chart";
+	$CATEGORY = "Bar graph";
+	$ROUND = "Round";
+	$PASSWORD = "Password";
+	$RESET = "Reset";
+	$DISABLE = "Disable";
+	$KEEPFOLDER = "Keep round";
+	$TOTALVOTES = "Total votes";
+	$CHOICEVOTES = "Votes per choice";
+	$SYSTEMRESET = "System successfully reset!";
+} else {
 		//General
 	$RED = "Red";
 	$BLUE = "Blue";
@@ -57,7 +92,7 @@ if ($lang == "nl") {
 	$AGAIN = "Retry";
 	$SEERESULTS = "View the results";
 		//results.php
-	$RESULTS = "Results";	//make a htaccess rewrite rule with the same content (lowercase & no spaces) & add one for "/vote"
+	$RESULTS = "Results";
 	$NUMBERCHOICES = "Number of choices";
 	$NUMBERQUESTIONS = "Number of questions";
 	$START = "Start";

@@ -1,7 +1,8 @@
 voting_system
 =============
 
-A simple system for local votings
+A simple system for local votings.
+Demo: http://www.tuurlievens.net/vote
 
 ###HOW TO USE:
 >1. Upload to server with PHP (Apache is optional, instead add ".php" to the urls in your browser)

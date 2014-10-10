@@ -6,7 +6,7 @@ Rewriterule ^$ vote.php
 	#EN
 Rewriterule ^vote$ vote.php
 Rewriterule ^results$ results.php
-Rewriterule ^reset$ reset.php
+Rewriterule ^admin$ admin.php
 
 	#NL
 Rewriterule ^stem$ vote.php

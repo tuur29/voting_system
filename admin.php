@@ -1,12 +1,36 @@
 <?php
-	include_once("options.php");
-	include_once("assets/language.php");
+
+ob_start();
+session_start();
+include_once("options.php");
+include_once("assets/language.php");
+
+if (!isset($_SESSION["loggedin"]) || !$_SESSION["loggedin"]) { 
+
+?>
+
+<form action="assets/login.php" method="post">
+	<input name="pass" type="password" placeholder="<?php echo $PASSWORD ?>" autofocus />
+	<input type="submit" value="<?php echo $LOGIN ?>" />
+</form>
+
+<?php
+	return;
+}
+
+if (isset($_POST['incr'])){
+	$n = intval(file_get_contents($folder."/active.txt"));
+	file_put_contents($folder."/active.txt", $n+1, LOCK_EX);
+	echo $n+1;
+	return;
+}
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title><?php echo $RESET ?></title>
+	<title><?php echo $RESET; ?></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
@@ -22,7 +46,7 @@
 		
 		.alert, .row { margin-top: 50px; }
 		.col-md-8 {
-			background: #efefef;
+			background: #f6f6f6;
 			border-radius: 10px;
 			padding: 25px;
 		}
@@ -33,19 +57,14 @@
 		}
 		#keepBox {
 			display: none;
-			width: auto
+			width: auto;
 		}
 		
-<?php if (is_dir($folder) && file_exists($folder."/round.txt")){ ?>
 		#disableBtn { display: inline-block; }
 		.checkbox {
 			display: inline-block;
 			padding: 0 5px 7px 30px;
 		}
-<?php }else { ?>
-		#disableBtn { display: none; }
-		.checkbox { display: none; }
-<?php } ?>
 		
 		@media (max-width: 768px){
 			body { background: #efefef; }
@@ -55,27 +74,63 @@
 				background: none;
 				border-radius: 0px;
 			}
+			#keepBox { width: 100%; }
 		}
 		
 	</style>
 </head>
 <body>
 <div class="container">
+		
 <?php
-		if (isset($_GET['success'])){
-?>
 
-	<div class="alert alert-success"><?php echo $SYSTEMRESET ?></div>
-
-<?php
-	}else if (isset($_GET['error'])){
-?>
-
-	<div class="alert alert-danger"><?php echo $ERROR ?></div>
-
-<?php
-	
+if (isset($_POST['remove'])){
+	if (is_dir($folder)){
+		if (isset($_POST['keep'])){
+			rename($folder,$_POST['keep']);
+		}
+		deldir($folder);
 	}
+
+}else if (isset($_POST['questions']) && $_POST['questions']) {
+
+	for ($i=0;$i<$_POST['questions'];$i++){
+		$choices[$i] = $_POST['choices'.($i+1)];
+	}
+
+	if (is_dir($folder)){
+		if (isset($_POST['keep'])){
+			rename($folder,$_POST['keep']);
+		}
+	}else {
+		mkdir($folder);
+	}
+
+	file_put_contents($folder."/round.txt", time(), LOCK_EX);
+
+	if (isset($_POST['step'])) {
+		file_put_contents($folder."/active.txt", "1", LOCK_EX);
+	}else {
+		file_put_contents($folder."/active.txt", count($choices), LOCK_EX);
+	}
+
+	for ($i=0; $i<count($choices); $i++){
+		if ($choices[$i]=="") $choices[$i] = 1;
+		file_put_contents($folder."/round.txt", $separator.$choices[$i], FILE_APPEND | LOCK_EX);
+		file_put_contents($folder."/".($i+1).".txt", "0", LOCK_EX);
+	}
+	
+	echo '<div class="alert alert-success">'. $SYSTEMRESET .'</div>';
+}
+
+
+function deldir($dir) {
+	foreach(glob($dir . '/*') as $file) {
+		if(is_dir($file)) rrmdir($file); else unlink($file);
+	}
+	rmdir($dir);
+}
+
 ?>
 	
 	<div class="row">
@@ -95,27 +150,36 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="password" class="col-sm-4 control-label"><?php echo $PASSWORD ?></label>
-					<div class="col-sm-8">
-						<input type="password" name="password" class="form-control" placeholder="<?php echo $PASSWORD ?>">
+					<div class="col-sm-offset-4 col-sm-8">
+						<div class="checkbox">
+							<label>
+								<input id="step" name="step" type="checkbox"><?php echo $STEPBYSTEP ?>
+							</label>
+						</div>
+						<?php if (is_dir($folder) && file_exists($folder."/round.txt")){ ?>
+						<div class="checkbox">
+							<label>
+								<input id="keep" type="checkbox"><?php echo $KEEPFOLDER ?>
+							</label>
+						</div>
+						<input type="text" id="keepBox" class="form-control" placeholder="<?php echo $OLDROUNDNAME; ?>">
+						<?php } ?>
 					</div>
 				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-4 col-sm-8">
-						<button type="submit" class="btn btn-default"><?php 
-																		if (is_dir($folder) && file_exists($folder."/round.txt")){
-																			echo $RESET;
-																		} else {
-																			echo $START;
-																		}
-																		?></button>
-						<button id="disableBtn" name="disable" type="submit" class="btn btn-default"><?php echo $DISABLE ?></button>
-						<div class="checkbox">
-							<label>
-						  		<input type="checkbox"> <?php echo $KEEPFOLDER ?>
-							</label>
-					  	</div>
-						<input type="text" id="keepBox" name="keep" class="form-control" value="1739204639" placeholder="new round name">
+						<button type="submit" class="btn btn-primary">
+							<?php 
+								if (is_dir($folder) && file_exists($folder."/round.txt")){
+									echo $RESET;
+								} else {
+									echo $START;
+								}
+							?>
+						</button>
+						<?php if (is_dir($folder) && file_exists($folder."/round.txt")){ ?>
+						<button id="disableBtn" name="disable" type="submit" class="btn btn-danger"><?php echo $REMOVE ?></button>
+						<?php } ?>
 					</div>
 				</div>
 			</form>
@@ -153,87 +217,23 @@
 		}
 	});
 	
-	$('.checkbox input').change(function(){
+	$('#keep').change(function(){
 		if (this.checked){
-			$('#keepBox').val("");
 			$('#keepBox').show();
+			$('#keepBox').attr("name","keep");
 		}else {
-			$('#keepBox').val("1739204639");
+			$('#keepBox').removeAttr("name");
 			$('#keepBox').hide();
 		}
 	});
 	
 	setTimeout(function(){
-		$(".alert").slideUp();
+		$(".alert").slideUp(function(){$(this).remove()});
 	},1000);
 	
 </script>
-	
-<?php
-	if (isset($_POST['questions'])){
-		for ($i=0;$i<$_POST['questions'];$i++){
-			$choices[$i] = $_POST['choices'.($i+1)];
-		}
-	}
 
-	if (isset($_POST['disable']) && isset($_POST['password']) && $_POST['password']==$pass){
-		if (is_dir($folder)){
-			deldir($folder);
-		}
-	
-?>
-	
-	<script>
-		var url = window.location.href;
-		console.log(url);
-		window.location.replace(url.substring(0, url.indexOf('?'))+"?success");
-	</script>
-	
-<?php
-		
-	}else if (!isset($_POST['disable']) && isset($_POST['password']) && $_POST['password']==$pass && isset($choices)) {
-		if (is_dir($folder)){
-			deldir($folder);
-		}
-		mkdir($folder);
-		file_put_contents($folder."/round.txt", time(), LOCK_EX);
-		for ($i=0; $i<count($choices)+0; $i++){
-			file_put_contents($folder."/round.txt", "-".$choices[$i], FILE_APPEND | LOCK_EX);
-			file_put_contents($folder."/".($i+1).".txt", "0", LOCK_EX);
-		}
-?>
-	
-	<script>
-		var url = window.location.href;
-		console.log(url);
-		window.location.replace(url.substring(0, url.indexOf('?'))+"?success");
-	</script>
-	
-<?php
-	}else if (isset($_POST['password'])) {
-?>
-
-	<script>
-		var url = window.location.href;
-		console.log(url);
-		window.location.replace(url.substring(0, url.indexOf('?'))+"?error");
-	</script>
-	
-<?php
-	}
-
-	function deldir($dir) {
-		if ($_POST['keep']!="1739204639"){
-			rename($dir,$_POST['keep']);
-		}else {
-			foreach(glob($dir . '/*') as $file) {
-				if(is_dir($file)) rrmdir($file); else unlink($file);
-			}
-			rmdir($dir);
-		}
-	}
-
-?>
-	
 </body>
 </html>
+
+<?php ob_flush(); ?>

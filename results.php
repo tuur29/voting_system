@@ -1,7 +1,18 @@
 <?php
-	include_once("options.php");
-	include_once("assets/language.php");
-	if (is_dir($folder) && file_exists($folder."/round.txt")){
+
+ob_start();
+session_start();
+include_once("options.php");
+include_once("assets/language.php");
+
+if (is_dir($folder) && file_exists($folder."/round.txt")){
+	$loggedin = false;
+	if (isset($_SESSION["loggedin"])&&$_SESSION["loggedin"]) $loggedin = true;
+	if ($loggedin) {
+		$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
+		$activeQuestion = file_get_contents($folder."/active.txt");
+	}
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -50,7 +61,6 @@
 		.percent { font-weight: bold; }
 		#graph { height: 300px; }
 		.col-sm-7 { margin-top: 20px; }
-		.btn-group { margin-right: 10px; }
 		h2 {
 			text-align: center;
 			cursor: pointer;
@@ -64,13 +74,69 @@
 		}
 		#buttons { float: left; }
 		#buttons .btn-group { margin: 0 }
+		.seperator { margin: 0 10px 0 0; }
+		#buttons form {
+			display: inline-block;
+			vertical-align: middle;
+			max-width: 200px;
+			margin-left: 10px;
+		}
 		#credits {
 			float: right;
 			font-size: 10px;
 			padding-top: 21px;
 		}
+		#popup {
+			display: none;
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 2;
+			text-align: center;
+			background: rgba(0,0,0,0.7);
+			cursor: pointer;
+		}
+		#popup > * {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 768px;
+		}
+		#popup iframe {
+			height: 400px;
+			margin-top: -200px;
+			margin-left: -384px;
+			box-sizing: border-box;
+			border-radius: 15px;
+			border: 2px solid #000;
+			box-shadow: 0 0 15px #000;
+		}
+		#popup div {
+			text-align: right;
+			margin-left: -399px;
+			margin-top: 205px;
+			color: #eee;
+			text-decoration: underline;
+		}
 		@media (max-width: 768px){
 			.container { padding-top: 0px; }
+			.btnLabel { display: none; }
+			#popup iframe {
+				width: 100%;
+				max-width: 768px;
+				position: static;
+				margin: 50px 0 0 0;
+				border-radius: 0;
+				border: none;
+			}
+			#popup div {
+				position: static;
+				padding: 10px 20px 0 0;
+				width: 100%;
+				margin: 0;
+			}
 		}
 	</style>
 	
@@ -78,6 +144,12 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
 <body>
+
+<div id="popup">
+	<iframe src="admin.php"></iframe>
+	<div><?php echo $CLOSE ?></div>
+</div>
+
 <div class="container">
 	<div class="row">
 		<div class="col-sm-5">
@@ -92,13 +164,17 @@
 	
 </div>
 
-
 <div id="footer">
 	<div id="buttons">
+		
+		<?php if ($livetoggle) { ?>
+		
 		<div class="btn-group">
-			<button value="start" class="btn btn-default disabled"><span class="glyphicon glyphicon-play"></span> <span class="btnLabel"><?php echo $START ?></span></button>
-			<button value="stop" id="stop" class="btn btn-default"><span class="glyphicon glyphicon-pause"></span> <span class="btnLabel"><?php echo $PAUSE ?></span></button>
+			<button value="start" class="status btn btn-default"><span class="glyphicon glyphicon-play"></span> <span class="btnLabel"><?php echo $START ?></span></button>
+			<button value="stop" class="status btn btn-default"><span class="glyphicon glyphicon-pause"></span> <span class="btnLabel"><?php echo $PAUSE ?></span></button>
 		</div>
+		
+		<?php } ?>
 		
 		<div class="btn-group dropup">
 			<button type="button" class="btn btn-default dropdown-toggle">
@@ -119,27 +195,56 @@
 			</ul>
 		</div>
 		
+		<?php if ($loggedin) { ?>
+		
 		<div class="btn-group dropup">
 			<button type="button" class="btn btn-default dropdown-toggle">
 			<span class="glyphicon glyphicon-floppy-open"></span> <span class="btnLabel"><?php echo $ROUND ?></span> <span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu" id="folderDrop">
 				<?php
-					
 					if ($handle = opendir('.')) {
-						$blacklist = array('.', '..', 'options.php', 'reset.php', 'results.php', 'vote.php', '.htaccess', 'assets', '.gitattributes', '.gitignore', 'README.md', '.git');
-						while (false !== ($file = readdir($handle))) {
+						$blacklist = array('assets', '.git', 'old');
+						$dirs = array_filter(glob('*'), 'is_dir');
+						foreach ($dirs as $file) {
 							if (!in_array($file, $blacklist)) {
 								echo "<li><a href='#'>".$file."</a></li>";
 							}
 						}
 						closedir($handle);
 					}
-					
 				?>
 			</ul>
 		</div>
+		<span class="seperator"></span>
+		<?php if (count($nChoices) > $activeQuestion) { ?>
+		<div class="btn-group">
+			<button id="next" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <span class="btnLabel"><?php echo $NEXT ?></span></button>
+		</div>
+		<?php } ?>
 		
+		<div class="btn-group">
+			<button id="admin" class="btn btn-default"><span class="glyphicon glyphicon-user"></span> <span class="btnLabel">Admin</span></button>
+		</div>
+		
+		<?php } ?>
+		
+		<form action="assets/login.php" method="post">
+			<?php if (!$loggedin) { ?>
+			
+			<div class="input-group">
+				<input type="password" placeholder="<?php echo strtolower($PASSWORD) ?>" name="pass" class="form-control" />
+				<span class="input-group-btn">
+					<button class="btn btn-default"><span class="glyphicon glyphicon-log-in"></span></button>
+				</span>
+			</div>
+			
+			<?php } else { ?>
+			
+			<button name="logout" class="btn btn-default"><span class="glyphicon glyphicon-log-out"></span> <span class="btnLabel"><?php echo $LOGOUT ?></span></button>
+			
+			<?php } ?>
+		</form>
 	</div>
 	<div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
 </div>
@@ -159,28 +264,21 @@ var folder = "<?php if (isset($_GET['round'])) echo $_GET['round']; else echo $f
 
 if (window.location.hash && !isNaN(window.location.hash.substring(1)) && window.location.hash.substring(1) != ""){
 	var question = window.location.hash.substring(1);
-}
-$(window).resize(function(){ hideLabels(); });
-
-	hideLabels();
-function hideLabels(){
-	if ( $(window).width() < 520 ){
-		$("#buttons .btnLabel").hide();
-	}else {
-		$("#buttons .btnLabel").show();
-	}
-}
-	
+}	
 $("#questionCount").html("<?php echo $QUESTION ?>"+" "+question);
-
 Init();
+	
+function notificaton(type,text) {
+	$('<div class="alert alert-'+type+'">'+text+'</div>').prependTo(".container").delay(1000).slideUp(function(){$(this).remove()});
+}	
+	
 function Init(){
 	
 	$.ajax({
 		url: folder+"/round.txt",
 		success:function(result){
 			var id = result.substr(0,10);
-			result = result.substr(11).split("-");
+			result = result.substr(11).split("<?php echo $separator ?>");
 			nChoices = result;
 			$("#questionsDrop").html("");
 			if (nChoices.length > 1){
@@ -213,7 +311,7 @@ function getData() {
 	$.ajax({
 		url: folder+"/"+question+".txt",
 		success:function(result){
-			result = result.split("-");
+			result = result.split("<?php echo $separator ?>");
 			result.shift();
 			
 			var count = result.length;
@@ -283,8 +381,8 @@ function getData() {
 			
 		},
 		error:function(error){
-			$("html").append("<p><?php echo $TRYAGAIN ?></p>");
-		},
+			notificaton("danger","<?php echo $NOTFOUND ?>")
+		}
 	});
 }
 	
@@ -294,7 +392,7 @@ function setLoop() {
 	}
 	checkLoop = setInterval(function() {
 		getData();
-	},750);
+	},<?php echo $refreshinterval; ?>);
 }
 
 function assignColor(n) {
@@ -345,16 +443,34 @@ $("li a").on("mousedown",function() {
 		Init();
 	}
 });
+	
+$("#popup,#admin").click(function(){
+	$("#popup").fadeToggle();
+});
+	
+$("#next").click(function(){
+	$(this).attr("disabled");
+	$.ajax({
+		type: "POST",
+		url: "admin.php",
+		data: "incr=true",
+		success: function(data){
+			notificaton("info","<?php echo $ACTIVEQUESTION ?>: "+data);
+			$("#next").removeAttr("disabled");
+			if (data>=nChoices.length) {
+				$("#next").fadeOut();
+			}
+		}
+	});
+});
 
 $("#buttons button").click(function(){
 	if ($(this).val() == "start"){
 		setLoop();
-		$("button[value=start]").addClass("disabled");
-		$("button[value=stop]").removeClass("disabled");
+		$("#buttons .status").toggle();
 	}else if ($(this).val() == "stop"){
 		clearInterval(checkLoop);
-		$("button[value=start]").removeClass("disabled");
-		$("button[value=stop]").addClass("disabled");
+		$("#buttons .status").toggle();
 	}
 });
 
@@ -367,12 +483,14 @@ $(".dropdown-toggle").focusout(function() {
 });
 
 </script>
+</body>
+</html>
 	
 <?php
+		
 	}else {
 		echo "<html><body><p>".$NOTACTIVE."</p>";
 	}
-?>
+	ob_flush();
 
-</body>
-</html>
+?>

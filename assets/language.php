@@ -1,5 +1,52 @@
 <?php
 
+//General
+$RED = "Red";
+$BLUE = "Blue";
+$YELLOW = "Yellow";
+$GREEN = "Green";
+$BLACK = "Black";
+$PINK = "Pink";
+$ORANGE = "Orange";
+$CYAN = "Cyan";
+$WHITE = "White";
+$CREDITS = "Made by";
+$NOTACTIVE = "There is no active vote.";
+$QUESTION = "Question";
+$ERROR = "An error has occured!";
+$PASSWORD = "Password";
+//vote.php
+$VOTING = "Voting";
+$VOTED = "You voted for";
+$AGAIN = "Retry";
+$SEERESULTS = "View the results";
+//results.php
+$RESULTS = "Results";
+$NUMBERCHOICES = "Number of choices";
+$NUMBERQUESTIONS = "Number of questions";
+$START = "Start";
+$PAUSE = "Pause";
+$GRAPH = "Graph";
+$PIE = "Pie chart";
+$CATEGORY = "Bar graph";
+$ROUND = "Round";
+$NEXT = "Next question";
+$LOGOUT = "Logout";
+$CLOSE = "Close";
+$ACTIVEQUESTION = "Current active question";
+$NOTFOUND = "Cannot find data!";
+//admin.php
+$LOGIN = "Login";
+$RESET = "Reset";
+$REMOVE = "Remove";
+$KEEPFOLDER = "Keep round";
+$OLDROUNDNAME = "old round name";
+$STEPBYSTEP = "Allow step by step questioning";
+$TOTALVOTES = "Total votes";
+$CHOICEVOTES = "Votes per choice";
+$SYSTEMRESET = "System successfully reset!";
+
+
 if ($lang == "nl") {
 	$RED = "Rood";
 	$BLUE = "Blauw";
@@ -10,7 +57,6 @@ if ($lang == "nl") {
 	$ORANGE = "Oranje";
 	$CYAN = "Cyaan";
 	$WHITE = "Wit";
-	$TRYAGAIN = "Fout, probeer opnieuw.";
 	$CREDITS = "Gemaakt door";
 	$NOTACTIVE = "Er is geen stemming aan de gang.";
 	$QUESTION = "Vraag";
@@ -20,7 +66,10 @@ if ($lang == "nl") {
 	$AGAIN = "Opnieuw";
 	$SEERESULTS = "Bekijk de resultaten";	
 	$RESULTS = "Resultaten";
-	$KEEPFOLDER = "Bewaar ronde";
+	$KEEPFOLDER = "Bewaar vorige ronde";
+	$OLDROUNDNAME = "naam oude ronde";
+	$INCREASE = "Volgende vraag";
+	$STEPBYSTEP = "Stel vragen vraag per vraag";
 	$TOTALVOTES = "Totaal aantal stemmen";
 	$CHOICEVOTES = "Stemmen per keuze";
 	$START = "Start";
@@ -33,82 +82,13 @@ if ($lang == "nl") {
 	$NUMBERQUESTIONS = "Aantal vragen";
 	$PASSWORD = "Wachtwoord";
 	$RESET = "Resetten";
-	$DISABLE = "Uitschakelen";
+	$REMOVE = "Verwijderen";
 	$SYSTEMRESET = "Het systeem is gereset!";
-} else if ($lang == "???") {							// Add your own language here!
-	$RED = "Red";
-	$BLUE = "Blue";
-	$YELLOW = "Yellow";
-	$GREEN = "Green";
-	$BLACK = "Black";
-	$PINK = "Pink";
-	$ORANGE = "Orange";
-	$CYAN = "Cyan";
-	$WHITE = "White";
-	$TRYAGAIN = "Error, try again.";
-	$CREDITS = "Made by";
-	$NOTACTIVE = "There is no vote active.";
-	$QUESTION = "Question";
-	$ERROR = "An error has occured!";
-	$VOTING = "Voting";
-	$VOTED = "You voted for";
-	$AGAIN = "Retry";
-	$SEERESULTS = "View the results";
-	$RESULTS = "Results";	//make a htaccess rewrite rule with the same content (lowercase & no spaces) & add one for "/vote"
-	$NUMBERCHOICES = "Number of choices";
-	$NUMBERQUESTIONS = "Number of questions";
-	$START = "Start";
-	$PAUSE = "Pause";
-	$GRAPH = "Graph";
-	$PIE = "Pie chart";
-	$CATEGORY = "Bar graph";
-	$ROUND = "Round";
-	$PASSWORD = "Password";
-	$RESET = "Reset";
-	$DISABLE = "Disable";
-	$KEEPFOLDER = "Keep round";
-	$TOTALVOTES = "Total votes";
-	$CHOICEVOTES = "Votes per choice";
-	$SYSTEMRESET = "System successfully reset!";
-} else {
-		//General
-	$RED = "Red";
-	$BLUE = "Blue";
-	$YELLOW = "Yellow";
-	$GREEN = "Green";
-	$BLACK = "Black";
-	$PINK = "Pink";
-	$ORANGE = "Orange";
-	$CYAN = "Cyan";
-	$WHITE = "White";
-	$TRYAGAIN = "Error, try again.";
-	$CREDITS = "Made by";
-	$NOTACTIVE = "There is no vote active.";
-	$QUESTION = "Question";
-	$ERROR = "An error has occured!";
-		//vote.php
-	$VOTING = "Voting";
-	$VOTED = "You voted for";
-	$AGAIN = "Retry";
-	$SEERESULTS = "View the results";
-		//results.php
-	$RESULTS = "Results";
-	$NUMBERCHOICES = "Number of choices";
-	$NUMBERQUESTIONS = "Number of questions";
-	$START = "Start";
-	$PAUSE = "Pause";
-	$GRAPH = "Graph";
-	$PIE = "Pie chart";
-	$CATEGORY = "Bar graph";
-	$ROUND = "Round";
-		//reset.php
-	$PASSWORD = "Password";
-	$RESET = "Reset";
-	$DISABLE = "Disable";
-	$KEEPFOLDER = "Keep round";
-	$TOTALVOTES = "Total votes";
-	$CHOICEVOTES = "Votes per choice";
-	$SYSTEMRESET = "System successfully reset!";
+	$NEXT = "Volgende vraag";
+	$LOGOUT = "Log uit";
+	$CLOSE = "Sluiten";
+	$ACTIVEQUESTION = "Actieve vraag";
+	$NOTFOUND = "Kan gegevens niet vinden!";
 }
 
 ?>

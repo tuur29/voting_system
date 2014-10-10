@@ -1,8 +1,14 @@
 voting_system
 =============
 
-A simple system for local votings.
+A simple system for local votings.  
 Demo: http://www.tuurlievens.net/vote
+
+-------------
+
+Copyright (c) 2014 Tuur Lievens  
+http://www.tuurlievens.net/  
+Licensed under the MIT license
 
 ###HOW TO USE:
 >1. Upload to server with PHP (Apache is optional, instead add ".php" to the urls in your browser)
@@ -32,9 +38,3 @@ Either actions support backing up the current votes by selecting "Keep round" an
 At the moment there is 1 additonal language option available: dutch ("nl").
 You can add your own tranlsation in "assets/language.php".
 You can vote and view the results with all browsers (yes this includes IE8)!
-
--------------
-
-Copyright (c) 2014 Tuur Lievens
-http://www.tuurlievens.net/
-Licensed under the MIT license

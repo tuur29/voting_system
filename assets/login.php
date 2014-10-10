@@ -19,7 +19,7 @@ if (!isset($_POST["logout"])) {
 }
 
 //login successfull!
-<script>window.location = document.referrer;</script>";
+echo "<script>window.location = document.referrer;</script>";
 ob_flush();
 
 ?>

@@ -204,7 +204,7 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			<ul class="dropdown-menu" id="folderDrop">
 				<?php
 					$time = file_get_contents($folder."/round.txt",null,null,null,10);	
-					echo "<li><a href='#'><u>".$folder."</u> (<i>".date("j/n/Y",$time)."</i>)</a></li>";
+					echo "<li><a href='#'><u>".$folder."</u><i> (".date("j/n/Y",$time).")</i></a></li>";
 					if ($handle = opendir('.')) {
 						$blacklist = array('assets',$folder, '.git');
 						$dirs = array_filter(glob('*'), 'is_dir');
@@ -212,7 +212,7 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 						foreach ($dirs as $dir) {
 							if (!in_array($dir, $blacklist)) {
 								$t = file_get_contents($dir."/round.txt",null,null,null,10);
-								echo "<li><a href='#'>".$dir." (<i>".date("j/n/Y",$t)."</i>)</a></li>";
+								echo "<li><a href='#'>".$dir."<i> (".date("j/n/Y",$t).")</i></a></li>";
 							}
 						}
 						closedir($handle);
@@ -449,10 +449,10 @@ $("li a").on("mousedown",function() {
 		graph = "cat";
 		getData();
 	}else if ( $(this).parents('.dropdown-menu').attr('id') == "folderDrop" ){
-		folder = $(this).text();
+		folder = $(this).clone().children('i').remove().end().text();
 		window.location.hash = "";
 		question = 1;
-		$(".row h3").html("<?php echo $QUESTION ?> "+question);
+		$(".row h3:not(#count)").html("<?php echo $QUESTION ?> "+question);
 		clearInterval(checkLoop);
 		Init();
 	}

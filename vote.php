@@ -1,9 +1,31 @@
 <?php
-	ob_start();
-	include_once("options.php");
-	include_once("assets/language.php");
 
-	if (is_dir($folder) && file_exists($folder."/round.txt")){
+ob_start();
+include_once("options.php");
+include_once("assets/language.php");
+
+if (is_dir($folder) && file_exists($folder."/round.txt")){
+	$id = file_get_contents($folder."/round.txt",null,null,null,10);
+	$votes = [];
+	$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
+	$activeQuestion = file_get_contents($folder."/active.txt");
+	if (isset($_COOKIE[$id])) $votes = json_decode($_COOKIE[$id]);
+	
+	if (isset($_POST['question']) && isset($_POST['choice']) && $_POST['question'] <= count($nChoices) && $_POST['question'] <= $activeQuestion && $_POST['choice'] <= $nChoices[$_POST['question']-1]){
+		$notvoted = true;
+		foreach ($votes as $v) {
+			if ($v[0]==$_POST['question']) {
+				$notvoted = false;
+				break;
+			}
+		}
+		if ($notvoted) {
+			array_push($votes,[$_POST['question'],$_POST['choice']]);
+			file_put_contents($folder."/".$_POST['question'].".txt", $separator.$_POST['choice'], FILE_APPEND | LOCK_EX);
+			setcookie($id,json_encode($votes),time()+259200);
+		}
+	}
+	
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -48,7 +70,10 @@
 			.button#b7{ background-image: url('assets/buttons/orange.png'); }
 			.button#b8{ background-image: url('assets/buttons/cyan.png'); }
 			.button#b9{ background-image: url('assets/buttons/white.png'); }
-			h1 .label { margin: 100px 5px; }
+			h1 .label {
+				line-height: 2.5;
+				margin: 0 5px;
+			}
 			.label-red { background-color: #FF0A0A; }
 			.label-blue { background-color: #235BF3; }
 			.label-yellow { background-color: #FFDB0A; }
@@ -69,7 +94,7 @@
 			}
 			#footer a { margin: 0 10px }
 			#credits {
-				position: absolute;
+				position: fixed;
 				right: 10px;
 				bottom: 10px;
 				font-size: 10px;
@@ -123,147 +148,83 @@
 	</head>
 	<body>
 
-<?php
-		if (isset($_POST['question'])) $q = $_POST['question']; else $q = 1;
-		$id = file_get_contents($folder."/round.txt",null,null,null,10);
-		$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
-		$activeQuestion = file_get_contents($folder."/active.txt");
-		$allDone = true;
-		
-		if (isset($_COOKIE[$id])) {
-			$votes = explode($separator,$_COOKIE[$id]);
-			if (count($votes) < count($nChoices) && count($votes)!=$q && count($votes) < $activeQuestion) {
-				$allDone = false;
-			}else if (!isset($_POST['question']) && count($votes) < count($nChoices) && count($votes) < $activeQuestion){
-				$allDone = false;
+<?php	
+	if ($activeQuestion<=0) {
+?>
+<h1 style='margin-top: 200px;'><?php echo $WAITSTART ?></h1>
+<script>
+	var active = <?php echo $activeQuestion ?>;
+	var loop = setInterval(function(){
+		$.ajax({
+			url: "<?php echo $folder ?>/active.txt",
+			success: function(data){
+				if (data>parseInt(active)) {
+					location.reload(true);
+				}
 			}
-		}else {
-			$votes = array();
-			$allDone = false;
-		}
-		
-		if ( !$allDone ) {
-			if (isset($_POST['question']) && isset($_POST['choice'])){
-				file_put_contents($folder."/".$q.".txt", $separator.$_POST['choice'], FILE_APPEND | LOCK_EX);
-				array_push($votes,$_POST['choice']);
-				setcookie($id,implode($separator,$votes),time()+259200);
-			}else {
+		});
+	},<?php echo $refreshinterval; ?>);
+</script>
+<?php
+		return;
+	}
+	
+	if (!isset($_COOKIE[$id])) $lowest=1;  else $lowest = count($nChoices)+1;
+	foreach ($votes as $v) {
+		if ($v[0] <= $lowest) $lowest=$v[0]+1;
+	}
+	
+	if ( $lowest <= count($nChoices) && $lowest <= $activeQuestion ) {
+		$q = $lowest;
+		if ( $activeQuestion <= count($nChoices) ) $q = $activeQuestion;
 ?>
 
 <h1><?php echo $QUESTION." ".$q ?></h1>
-<div class="container"></div>
-
-	<!-- Scripts -->
+<div class="container">
+	<div class="row">
+<?php
+	$col = floor(12/ $nChoices[$q-1]);
+	if ($col*$nChoices[$q-1] != 12)	echo '<div class="col-md-1"></div>';
+	for ($i=1;$i<$nChoices[$q-1]+1;$i++) {
+		echo '<form action="" method="POST" class="col-md-'.$col.'"><div id="b'.$i.'" class="button"></div><input type="hidden" name="question" value="'.$q.'" /><input type="hidden" name="choice" value="'.$i.'" /></form>';
+	}
+	if ($col*$nChoices[$q-1] != 12)	echo '<div class="col-md-1"></div>';
+?>
+	</div>
+</div>
 	<script>
-		var clicked = false;
-		var id = <?php echo $id ?>;
-		var nChoices = <?php echo json_encode($nChoices) ?>;
-		var active = <?php echo $activeQuestion ?>;
-		var questions = nChoices.length;
-		var question = <?php echo count($votes)+1 ?>;
-		var votes = <?php echo json_encode($votes) ?>;
-		
-		for (var i=0; i<questions; i++){
-			var col = Math.floor(12/ nChoices[i] );
-			$(".container").append( '<div class="row" id="q'+(i+1)+'">');
-			
-			for (var n=0; n<nChoices[i]; n++){
-				$(".container #q"+(i+1)).append( '<div class="col-md-'+col+'"><div id="b'+(n+1)+'" class="button"><button value="'+(n+1)+'">'+(n+1)+'</button></div></div>' );
-			}
-			if (col*nChoices[i] != 12){
-				$(".container #q"+(i+1)).prepend('<div class="col-md-1"></div>');
-				$(".container #q"+(i+1)).append('<div class="col-md-1"></div>');
-			}
-		}
-		
-		$(".row").each(function(){
-			$(this).css("display","none");
-		});
-		$("#q"+question).css("display","block");
-		$("h1").html("<?php echo $QUESTION ?> "+ question );
-		
+		$('.container').hide();
+		$('.container').fadeIn(200);
 		$(".row .button").click(function() {
-			if (!clicked) {
-				clicked = true;
-				var choice = $(this).children("button").val();
-				question = parseInt($(this).children("button").parents(".row").attr('id').substring(1));
-				$.ajax({
-					type: "POST",
-					url: "vote.php",
-					data: "question="+question+"&choice="+choice,
-					success: function(){
-						votes.push(choice);
-						nextQuestion(question);
-					}
-				});
-			}
-		});
-		
-		function nextQuestion(q) {
-			$("#q"+q).fadeOut(function() {
-				if (q<questions&&question<active){
-					
-					$("h1").removeAttr("style");
-					$("h1").html("<?php echo $QUESTION ?> "+ (Number(q)+1) );
-					$("#q"+ (Number(q)+1) ).fadeIn();
-					clicked = false;
-					
-				}else {
-					var vars = [];
-					
-					$("h1").html("<?php echo $VOTED ?>:<br/>");
-					for (var i=0; i<votes.length; i++) {
-						$("h1").append("<span class='label label-"+defineVars(votes[i])[0]+"'>"+defineVars(votes[i])[1]+"</span>");
-					}
-					
-					setTimeout(function(){
-						$("h1").animate({
-							'margin-top': '200px'
-						},1000,function() {
-							$("#footer").slideDown();
-						});
-					},1);
-					
-					if (question==active&&question<questions) {
-						var loop = setInterval(function(){
-							$.ajax({
-								url: "<?php echo $folder ?>/active.txt",
-								success: function(data){
-									if (data>parseInt(active)) {
-										active=parseInt(data);
-										window.clearInterval(loop);
-										nextQuestion(active-1);
-									}
-								}
-							});
-						},<?php echo $refreshinterval; ?>);
-					}
-					
-				}
+			t = $(this);
+			$('.container').fadeOut(function(){
+				t.parent().submit();
 			});
-		}
+		});
 		
 	</script>
 
 <?php
-			}
-		}else {
+	}else {
+		if (!$hideownvotes) {
+			echo '<h1>'.$VOTEDFOR.':<br/></h1>';
+		} else {
+			echo '<h1>'.$VOTED.'</h1>';
+		}
 ?>
-	<h1></h1>
 	<script>
+		$("h1").hide();
+		$("h1").fadeIn();
+		$('h1').animate({'margin-top': '200px'});
+		
+		setTimeout(function(){
+			$("#footer").slideDown(400);
+		},600);
 		
 		var votes = <?php echo json_encode($votes) ?>;
-		$("h1").html("<?php echo $VOTED ?>:<br/>");
 		for (var i=0; i<votes.length; i++) {
-			$("h1").append("<span class='label label-"+defineVars(votes[i])[0]+"'>"+defineVars(votes[i])[1]+"</span> ");
+			$("h1").append("<span class='label label-"+defineVars(votes[i][1])[0]+"'>"+votes[i][0]+': '+defineVars(votes[i][1])[1]+"</span>");
 		}
-		
-		$("h1").css({
-			'margin-top': '200px'
-		});
-		setTimeout(function(){
-			$("#footer").css("display","block");
-		},50);
 		
 		var active = <?php echo $activeQuestion ?>;
 		var loop = setInterval(function(){
@@ -279,14 +240,14 @@
 		
 	</script>
 <?php
-		}
+	}
 		
-		if ($resultslink) {
-			echo '<div id="footer">';
-			$href = "results.php";
-			if ($seo) $href = strtolower($RESULTS);
-			echo "<a class='btn btn-default' target='_blank' href='".$href."'>".$SEERESULTS."</a></div>";
-		}
+	if ($resultslink) {
+		echo '<div id="footer">';
+		$href = "results.php";
+		if ($seo) $href = strtolower($RESULTS);
+		echo "<a class='btn btn-default' target='_blank' href='".$href."'>".$SEERESULTS."</a></div>";
+	}
 ?>
 
 <div id="credits"><?php echo $CREDITS ?> <a href="http://www.tuurlievens.net/" target="_blank">Tuur Lievens</a>.</div>
@@ -295,8 +256,9 @@
 
 <?php
 	
-	}else {
-		echo "<html><body><p>".$NOTACTIVE."</p></body></html>";
-	}
-	ob_flush();
+}else {
+	echo "<html><body><p>".$NOTACTIVE."</p></body></html>";
+}
+ob_flush();
+
 ?>

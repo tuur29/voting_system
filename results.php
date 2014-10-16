@@ -146,7 +146,7 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 <body>
 
 <div id="popup">
-	<iframe src="admin.php"></iframe>
+	<iframe src="admin.php?iframe"></iframe>
 	<div><?php echo $CLOSE ?></div>
 </div>
 
@@ -203,12 +203,16 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			</button>
 			<ul class="dropdown-menu" id="folderDrop">
 				<?php
+					$time = file_get_contents($folder."/round.txt",null,null,null,10);	
+					echo "<li><a href='#'><u>".$folder."</u> (<i>".date("j/n/Y",$time)."</i>)</a></li>";
 					if ($handle = opendir('.')) {
-						$blacklist = array('assets', '.git', 'old');
+						$blacklist = array('assets',$folder, '.git');
 						$dirs = array_filter(glob('*'), 'is_dir');
-						foreach ($dirs as $file) {
-							if (!in_array($file, $blacklist)) {
-								echo "<li><a href='#'>".$file."</a></li>";
+						
+						foreach ($dirs as $dir) {
+							if (!in_array($dir, $blacklist)) {
+								$t = file_get_contents($dir."/round.txt",null,null,null,10);
+								echo "<li><a href='#'>".$dir." (<i>".date("j/n/Y",$t)."</i>)</a></li>";
 							}
 						}
 						closedir($handle);
@@ -263,14 +267,21 @@ var question = 1;
 var folder = "<?php if (isset($_GET['round'])) echo $_GET['round']; else echo $folder; ?>";
 
 if (window.location.hash && !isNaN(window.location.hash.substring(1)) && window.location.hash.substring(1) != ""){
-	var question = window.location.hash.substring(1);
+	question = window.location.hash.substring(1);
 }	
 $("#questionCount").html("<?php echo $QUESTION ?>"+" "+question);
 Init();
 	
 function notificaton(type,text) {
 	$('<div class="alert alert-'+type+'">'+text+'</div>').prependTo(".container").delay(1000).slideUp(function(){$(this).remove()});
-}	
+}
+
+function changeQuestion(t) {
+	question = t.attr('id').substring(1);
+	window.location.hash = question;
+	$("#questionCount").html("<?php echo $QUESTION ?> "+question);
+	getData();
+}
 	
 function Init(){
 	
@@ -296,10 +307,12 @@ function Init(){
 			setLoop();
 			$("li a").on("mousedown",function() {
 				if ( $(this).parents('.dropdown-menu').attr('id') == "questionsDrop" ){
+					changeQuestion($(this));
 					question = $(this).attr('id').substring(1);
 					window.location.hash = question;
 					$("#questionCount").html("<?php echo $QUESTION ?> "+question);
 					getData();
+					
 				}
 			});
 		}
@@ -346,6 +359,7 @@ function getData() {
 				}
 			});
 			data.shift();
+			
 			
 			if (graph == "pie"){
 				$.plot('#graph', data, {
@@ -435,7 +449,7 @@ $("li a").on("mousedown",function() {
 		graph = "cat";
 		getData();
 	}else if ( $(this).parents('.dropdown-menu').attr('id') == "folderDrop" ){
-		folder = $(this).html();
+		folder = $(this).text();
 		window.location.hash = "";
 		question = 1;
 		$(".row h3").html("<?php echo $QUESTION ?> "+question);
@@ -460,6 +474,7 @@ $("#next").click(function(){
 			if (data>=nChoices.length) {
 				$("#next").fadeOut();
 			}
+			changeQuestion( $("#questionsDrop li:nth-child("+data+") a") );
 		}
 	});
 });

@@ -109,9 +109,9 @@ if (isset($_POST['remove'])){
 	file_put_contents($folder."/round.txt", time(), LOCK_EX);
 
 	if (isset($_POST['step'])) {
-		file_put_contents($folder."/active.txt", "1", LOCK_EX);
+		file_put_contents($folder."/active.txt", "0", LOCK_EX);
 	}else {
-		file_put_contents($folder."/active.txt", count($choices), LOCK_EX);
+		file_put_contents($folder."/active.txt", count($choices)+1, LOCK_EX);
 	}
 
 	for ($i=0; $i<count($choices); $i++){
@@ -120,7 +120,15 @@ if (isset($_POST['remove'])){
 		file_put_contents($folder."/".($i+1).".txt", "0", LOCK_EX);
 	}
 	
+	if (!isset($_GET["iframe"])) {
+		$href="results.php";
+		if ($seo) $href = strtolower($RESULTS);
+		echo "<script>window.location = './".$href."';</script>";
+		return;
+	}
+	
 	echo '<div class="alert alert-success">'. $SYSTEMRESET .'</div>';
+	echo "<script>setTimeout(function() { parent.location.reload(); },750);</script>";
 }
 
 

@@ -11,15 +11,17 @@ $ORANGE = "Orange";
 $CYAN = "Cyan";
 $WHITE = "White";
 $CREDITS = "Made by";
-$NOTACTIVE = "There is no active vote.";
+$NOTACTIVE = "There is no active vote";
 $QUESTION = "Question";
 $ERROR = "An error has occured!";
 $PASSWORD = "Password";
 //vote.php
 $VOTING = "Voting";
-$VOTED = "You voted for";
+$VOTEDFOR = "You voted for";
+$VOTED = "You finished voting";
 $AGAIN = "Retry";
 $SEERESULTS = "View the results";
+$WAITSTART = "The vote will soon begin";
 //results.php
 $RESULTS = "Results";
 $NUMBERCHOICES = "Number of choices";
@@ -37,8 +39,8 @@ $ACTIVEQUESTION = "Current active question";
 $NOTFOUND = "Cannot find data!";
 //admin.php
 $LOGIN = "Login";
-$RESET = "Reset";
-$REMOVE = "Remove";
+$RESET = "New round";
+$REMOVE = "Disable";
 $KEEPFOLDER = "Keep round";
 $OLDROUNDNAME = "old round name";
 $STEPBYSTEP = "Allow step by step questioning";
@@ -58,11 +60,12 @@ if ($lang == "nl") {
 	$CYAN = "Cyaan";
 	$WHITE = "Wit";
 	$CREDITS = "Gemaakt door";
-	$NOTACTIVE = "Er is geen stemming aan de gang.";
+	$NOTACTIVE = "Er is geen stemming aan de gang";
 	$QUESTION = "Vraag";
 	$ERROR = "Er is een fout opgetreden!";
 	$VOTING = "Stemmen";
-	$VOTED = "Je stemde op";
+	$VOTEDFOR = "Je stemde op";
+	$VOTED = "Je bent klaar met stemmen";
 	$AGAIN = "Opnieuw";
 	$SEERESULTS = "Bekijk de resultaten";	
 	$RESULTS = "Resultaten";
@@ -81,14 +84,15 @@ if ($lang == "nl") {
 	$NUMBERCHOICES = "Aantal keuzes";
 	$NUMBERQUESTIONS = "Aantal vragen";
 	$PASSWORD = "Wachtwoord";
-	$RESET = "Resetten";
-	$REMOVE = "Verwijderen";
+	$RESET = "Nieuwe ronde";
+	$REMOVE = "Uitschakelen";
 	$SYSTEMRESET = "Het systeem is gereset!";
 	$NEXT = "Volgende vraag";
 	$LOGOUT = "Log uit";
 	$CLOSE = "Sluiten";
 	$ACTIVEQUESTION = "Actieve vraag";
 	$NOTFOUND = "Kan gegevens niet vinden!";
+	$WAITSTART = "De stemming gaat binnenkort van start";
 }
 
 ?>

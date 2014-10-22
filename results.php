@@ -2,17 +2,19 @@
 
 ob_start();
 session_start();
-include_once("options.php");
-include_once("assets/language.php");
+include_once("defaults.php");
 
 if (is_dir($folder) && file_exists($folder."/round.txt")){
 	$loggedin = false;
-	if (isset($_SESSION["loggedin"])&&$_SESSION["loggedin"]) $loggedin = true;
+	$id = '0';
+	if (is_dir($folder) && file_exists($folder."/round.txt")){
+		$id = file_get_contents($folder."/round.txt",null,null,null,10);
+	}
+	if (isset($_SESSION["loggedin"])&&$_SESSION["loggedin"]==$id) $loggedin = true;
 	if ($loggedin) {
 		$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
-		$activeQuestion = file_get_contents($folder."/active.txt");
+		$active = file_get_contents($folder."/active.txt");
 	}
-
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -81,6 +83,15 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			max-width: 200px;
 			margin-left: 10px;
 		}
+		.next { display: none; }
+		<?php if ($active==0) { ?>
+		#on { display: block; }
+		<?php } else if ($active >= count($nChoices)) { ?>
+		#off { display: block; }
+		<?php } else if ($active < count($nChoices) && $active > 0) { ?>
+		#next { display: block; }
+		<?php } ?>
+		
 		#credits {
 			float: right;
 			font-size: 10px;
@@ -152,7 +163,7 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 
 <div class="container">
 	<div class="row">
-		<div class="col-sm-5">
+		<div id='data' class="col-sm-5">
 			<h3 id="questionCount"></h3>
 			<h4><?php echo $TOTALVOTES ?>:</h4><h3 id="count">0</h3>
 			<h4><?php echo $CHOICEVOTES ?>:</h4><table></table>
@@ -169,22 +180,61 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 		
 		<?php if ($livetoggle) { ?>
 		
-		<div class="btn-group">
-			<button value="start" class="status btn btn-default"><span class="glyphicon glyphicon-play"></span> <span class="btnLabel"><?php echo $START ?></span></button>
-			<button value="stop" class="status btn btn-default"><span class="glyphicon glyphicon-pause"></span> <span class="btnLabel"><?php echo $PAUSE ?></span></button>
+		<div class="btn-group status">
+			<?php if ($live) { ?>
+				<button value="stop" class="btn btn-default"><span class="glyphicon glyphicon-pause"></span> <span class="btnLabel"><?php echo $PAUSE ?></span></button>
+			<?php } else { ?>
+				<button value="start" class="btn btn-default"><span class="glyphicon glyphicon-play"></span> <span class="btnLabel"><?php echo $START ?></span></button>
+			<?php } ?>
+		
 		</div>
 		
-		<?php } ?>
+		<?php }
+		if ($loggedin) {
+		
+			if ($handle = opendir('.')) {
+				$blacklist = array('assets',$folder, '.git');
+				$folders = array_filter(glob('*'), 'is_dir');
+				closedir($handle);
+
+				$dirs = [];
+				foreach ($folders as $dir) {
+					if (!in_array($dir, $blacklist) && file_exists($dir."/round.txt")) {
+						array_push($dirs,$dir);
+					}
+				}
+			}
+		
+		if (count($dirs) > 0) {
+		?>
 		
 		<div class="btn-group dropup">
 			<button type="button" class="btn btn-default dropdown-toggle">
-			<span class="glyphicon glyphicon-stats"></span> <span class="btnLabel"><?php echo $GRAPH ?></span> <span class="caret"></span>
+				<span class="glyphicon glyphicon-floppy-open"></span> <span class="btnLabel"><?php echo $ROUND ?></span> <span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu">
-				<li><a href="#"><?php echo $CATEGORY ?></a></li>
-				<li><a href="#"><?php echo $PIE ?></a></li>
+			<ul class="dropdown-menu" id="folderDrop">
+				<?php
+				$time = file_get_contents($folder."/round.txt",null,null,null,10);
+				if ($active<0) {
+					echo "<li><a href='#'>".$folder."<i> (".date("j/n/Y",$time).")</i></a></li>";
+				} else {
+					echo "<li><a href='#'><u>".$folder."</u><i> (".date("j/n/Y",$time).")</i></a></li>";
+				}
+				foreach ($dirs as $dir) {
+					if (!in_array($dir, $blacklist)) {
+						$t = file_get_contents($dir."/round.txt",null,null,null,10);
+							echo "<li><a href='#'>".$dir."<i> (".date("j/n/Y",$t).")</i>";
+						if ($removerounds) {
+							echo "<form action='admin.php' method='POST'><button class='close'>&times;</button><input type='hidden' name='remove' value='".$dir."'></form>";
+						}
+						echo "</a></li>";
+					}
+				}
+				?>
 			</ul>
 		</div>
+
+		<?php }} ?>
 		
 		<div class="btn-group dropup">
 			<button type="button" class="btn btn-default dropdown-toggle">
@@ -195,37 +245,43 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			</ul>
 		</div>
 		
-		<?php if ($loggedin) { ?>
-		
 		<div class="btn-group dropup">
 			<button type="button" class="btn btn-default dropdown-toggle">
-			<span class="glyphicon glyphicon-floppy-open"></span> <span class="btnLabel"><?php echo $ROUND ?></span> <span class="caret"></span>
+				<span class="glyphicon glyphicon-stats"></span> <span class="btnLabel"><?php echo $GRAPH ?></span> <span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu" id="folderDrop">
-				<?php
-					$time = file_get_contents($folder."/round.txt",null,null,null,10);	
-					echo "<li><a href='#'><u>".$folder."</u><i> (".date("j/n/Y",$time).")</i></a></li>";
-					if ($handle = opendir('.')) {
-						$blacklist = array('assets',$folder, '.git');
-						$dirs = array_filter(glob('*'), 'is_dir');
-						
-						foreach ($dirs as $dir) {
-							if (!in_array($dir, $blacklist)) {
-								$t = file_get_contents($dir."/round.txt",null,null,null,10);
-								echo "<li><a href='#'>".$dir."<i> (".date("j/n/Y",$t).")</i></a></li>";
-							}
-						}
-						closedir($handle);
-					}
-				?>
+			<ul class="dropdown-menu">
+				<li><a href="#"><?php echo $CATEGORY ?></a></li>
+				<li><a href="#"><?php echo $PIE ?></a></li>
 			</ul>
 		</div>
-		<span class="seperator"></span>
-		<?php if (count($nChoices) > $activeQuestion) { ?>
-		<div class="btn-group">
-			<button id="next" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> <span class="btnLabel"><?php echo $NEXT ?></span></button>
+		
+		<?php if ($loggedin) { ?>
+		<div class="btn-group"></div>
+		
+		<div style='display:inline-block;'>
+			<div class="btn-group">
+				<button id="on" class="next btn btn-default"><span class="glyphicon glyphicon-off"></span> <span class="btnLabel"><?php echo $START ?></span></button>
+			</div>
+
+			<div class="btn-group">
+				<button id="next" class="next btn btn-default"><span class="glyphicon glyphicon-plus"></span> <span class="btnLabel"><?php echo $NEXT ?></span></button>
+			</div>
+
+			<div class="btn-group">
+				<button id="off" class="next btn btn-default"><span class="glyphicon glyphicon-off"></span> <span class="btnLabel"><?php echo $CLOSEROUND ?></span></button>
+			</div>
 		</div>
-		<?php } ?>
+		<div class="btn-group"></div>
+		
+		<div id="print" class="btn-group dropup">
+			<button class="btn btn-default dropdown-toggle">
+				<span class="glyphicon glyphicon-camera"></span> <span class="btnLabel"><?php echo $SCREENSHOT ?></span> <span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li><a class="data" href="#"><?php echo $TABLE ?></a></li>
+				<li><a class="graph" href="#"><?php echo $GRAPH ?></a></li>
+			</ul>
+		</div>
 		
 		<div class="btn-group">
 			<button id="admin" class="btn btn-default"><span class="glyphicon glyphicon-user"></span> <span class="btnLabel">Admin</span></button>
@@ -255,25 +311,27 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 
 <!-- Scripts -->
 <script src="assets/jquery-1.10.2.min.js"></script>
+<script src="assets/html2canvas.js"></script>
 <script language="javascript" type="text/javascript" src="assets/flot/jquery.flot.min.js"></script>
 <script language="javascript" type="text/javascript" src="assets/flot/jquery.flot.pie.min.js"></script>
 <script language="javascript" type="text/javascript" src="assets/flot/jquery.flot.categories.min.js"></script>
 <script>
 
 var checkLoop;
-var graph = "cat";
+var graph = '<?php echo $defaultgraph ?>';
 var nChoices;
 var question = 1;
 var folder = "<?php if (isset($_GET['round'])) echo $_GET['round']; else echo $folder; ?>";
 
 if (window.location.hash && !isNaN(window.location.hash.substring(1)) && window.location.hash.substring(1) != ""){
 	question = window.location.hash.substring(1);
-}	
+}
 $("#questionCount").html("<?php echo $QUESTION ?>"+" "+question);
 Init();
-	
+
 function notificaton(type,text) {
 	$('<div class="alert alert-'+type+'">'+text+'</div>').prependTo(".container").delay(1000).slideUp(function(){$(this).remove()});
+	console.log(text);
 }
 
 function changeQuestion(t) {
@@ -304,7 +362,7 @@ function Init(){
 			}
 			
 			getData();
-			setLoop();
+			<?php if ($live) echo 'setLoop();'; ?>
 			$("li a").on("mousedown",function() {
 				if ( $(this).parents('.dropdown-menu').attr('id') == "questionsDrop" ){
 					changeQuestion($(this));
@@ -331,12 +389,12 @@ function getData() {
 			$("#count").html(count);
 			$(".container table").html("");
 			var partResult = [];
-			for ( var i=0; i<nChoices[question-1];i++ ){
+			for ( var i=1; i<parseInt(nChoices[question-1])+1;i++ ){
 				partResult[i] = 0;
-				$(".container table").append("<tr><td><span class='label label-"+assignColor(i+1)[0]+"'>"+assignColor(i+1)[2]+"</span></td><td class='count'></td><td class='percent'></td></tr>");
+				$(".container table").append("<tr><td><span class='label label-"+assignColor(i)[0]+"'>"+assignColor(i)[2]+"</span></td><td class='count'></td><td class='percent'></td></tr>");
 			}
-			for ( var i=0; i<count;i++ ){
-				if (partResult[result[i]]) {
+			for ( var i=0; i<count; i++ ){
+				if (partResult[result[i]]>0) {
 					partResult[result[i]]++;
 				}else {
 					partResult[result[i]] = 1;
@@ -354,12 +412,10 @@ function getData() {
 				
 				if (graph == "pie"){
 					data.push({ data: v, label: n, color: assignColor(n)[1] });
-				} else if (graph == "cat") {
+				} else if (graph == "bar") {
 					data.push({ data: [[n,v]], label: n, color: assignColor(n)[1] });
 				}
 			});
-			data.shift();
-			
 			
 			if (graph == "pie"){
 				$.plot('#graph', data, {
@@ -373,7 +429,7 @@ function getData() {
 					},
 					legend: { show: false }
 				});
-			} else if (graph == "cat") {
+			} else if (graph == "bar") {
 				$.plot("#graph", data, {
 					series: {
 						bars: { 
@@ -446,14 +502,19 @@ $("li a").on("mousedown",function() {
 		graph = "pie";
 		getData();
 	}else if ( $(this).html() == "<?php echo $CATEGORY ?>" ){
-		graph = "cat";
+		graph = "bar";
 		getData();
 	}else if ( $(this).parents('.dropdown-menu').attr('id') == "folderDrop" ){
-		folder = $(this).clone().children('i').remove().end().text();
+		folder = $(this).clone().children('form,i').remove().end().text();
 		window.location.hash = "";
 		question = 1;
 		$(".row h3:not(#count)").html("<?php echo $QUESTION ?> "+question);
 		clearInterval(checkLoop);
+		if (folder=='<?php echo $folder ?>') {
+			$('.next').parent().fadeIn();
+		}else {
+			$('.next').parent().fadeOut();
+		}
 		Init();
 	}
 });
@@ -462,31 +523,64 @@ $("#popup,#admin").click(function(){
 	$("#popup").fadeToggle();
 });
 	
-$("#next").click(function(){
-	$(this).attr("disabled");
+$("#print a").on("mousedown",function(){
+	var w=window.open();
+	html2canvas($("#"+$(this).attr("class")), {
+		onrendered: function(canvas) {
+			var dataURL = canvas.toDataURL("image/png");
+			w.document.write('<img src="'+dataURL+'"/>');
+		}
+	});
+});
+
+$(".next").click(function(){
+	var b = $(this), d = $(this).attr("id");
+	b.attr("disabled");
 	$.ajax({
 		type: "POST",
 		url: "admin.php",
 		data: "incr=true",
 		success: function(data){
-			notificaton("info","<?php echo $ACTIVEQUESTION ?>: "+data);
-			$("#next").removeAttr("disabled");
-			if (data>=nChoices.length) {
-				$("#next").fadeOut();
+			if (d=='off') {
+				notificaton("info","<?php echo 'Round closed' ?> ");
+				b.fadeOut();
+			} else {
+				notificaton("info","<?php echo $ACTIVEQUESTION ?>: "+data);
+				b.removeAttr("disabled");
+				changeQuestion( $("#questionsDrop li:nth-child("+data+") a") );
+				if (d=='on') {
+					b.fadeOut();
+					$('#next').fadeIn();
+				}
+				if (data>=nChoices.length) {
+					b.fadeOut();
+					$('#off').fadeIn();
+				}
 			}
-			changeQuestion( $("#questionsDrop li:nth-child("+data+") a") );
 		}
 	});
 });
 
-$("#buttons button").click(function(){
+$("#folderDrop button").on("mousedown",function(e){
+	if ( confirm('<?php echo $SUREDELETE ?> '+$(this).parent().children('input[type=hidden]').val()+'?') ) {
+		$(this).parent().submit();
+	}
+	e.stopPropagation();
+	return false;
+});
+	
+$(".status button").click(function(){
 	if ($(this).val() == "start"){
 		setLoop();
-		$("#buttons .status").toggle();
+		$(this).val('stop');
+		$(this).children('.btnLabel').html('<?php echo $PAUSE ?>');
 	}else if ($(this).val() == "stop"){
 		clearInterval(checkLoop);
-		$("#buttons .status").toggle();
+		$(this).val('start');
+		$(this).children('.btnLabel').html('<?php echo $START ?>');
 	}
+	$(this).children('span:first').toggleClass('glyphicon-play');
+	$(this).children('span:first').toggleClass('glyphicon-pause');
 });
 
 $(".dropdown-toggle").click(function() {

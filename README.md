@@ -12,7 +12,7 @@ Licensed under the MIT license
 
 ###HOW TO USE:
 >1. Upload to server with PHP (Apache is optional, instead add ".php" to the urls in your browser)
-2. Configure options.php
+2. change password in "options.php" and copy and change needed settings from "defaults.php"
 3. Go to /admin(.php) and make a new round.
 4. Go to /vote or to the root folder to vote! (NL: /stem)
 5. See the results in real-time at /results (NL: /resultaten)
@@ -34,14 +34,13 @@ Clicking the "Disable" button removes the currently active round (including all 
 You can also make a new active round by filling the fields and pressing "New round".
 Either actions support backing up the current votes by selecting "Keep round" and giving it a name before pressing either "New round" or "Disable". These votes can be accessed by selecting the chosen name after clicking the "Round" button at "results(.php)".
 
+The default settings can be found in "defaults.php". To change them I suggest copying them to "options.php" and editing them there. "defaults.php" is meant as a fallback in case you don't edit all options. You can find explanations for each option in the comments after each option.
+
 ###COMPATIBILITY & LANGUAGES
 At the moment there is 1 additonal language option available: dutch ("nl").
-You can add your own tranlsation in "assets/language.php".
+You can add your own translation in "assets/language.php".
 You can vote and view the results with all browsers (yes this includes IE8)!
 
 ###TODO
 
-- print all results of round?
-
-- BUG: graph doesn't show empty options
 - BUG: using html chars in cookie not working on old android tablets?

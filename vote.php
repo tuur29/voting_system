@@ -1,10 +1,21 @@
 <?php
 
 ob_start();
-include_once("options.php");
-include_once("assets/language.php");
+include_once("defaults.php");
 
 if (is_dir($folder) && file_exists($folder."/round.txt")){
+	
+	$chartest = [ 0, 'abc', [0,'abc'] ];
+	if (!isset($_COOKIE["chartest"])){
+		setcookie("chartest", json_encode($chartest),time()+259200);
+		header("refresh: 0;");
+		return;
+	}
+	if (json_decode($_COOKIE["chartest"]) != $chartest ) {
+		echo $NOTCOMPATIBLE;
+		return;
+	}
+	
 	$id = file_get_contents($folder."/round.txt",null,null,null,10);
 	$votes = [];
 	$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
@@ -25,7 +36,6 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			setcookie($id,json_encode($votes),time()+259200);
 		}
 	}
-	
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -44,6 +54,10 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 		<style>
 			body { background-color: #fefefe; }
 			h1 {
+				text-align: center;
+				margin-top: 50px;
+			}
+			h2 {
 				text-align: center;
 				margin-top: 50px;
 			}
@@ -86,7 +100,7 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			#footer {
 				position: absolute;
 				right: 0;
-				bottom: 15px;
+				bottom: 11px;
 				display: none;
 				left: 0;
 				text-align: center;
@@ -147,11 +161,9 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	</head>
 	<body>
-
-<?php	
-	if ($activeQuestion<=0) {
-?>
+<?php if ($activeQuestion==0) { ?>
 <h1 style='margin-top: 200px;'><?php echo $WAITSTART ?></h1>
+		<?php if ($reloadactive) { ?>
 <script>
 	var active = <?php echo $activeQuestion ?>;
 	var loop = setInterval(function(){
@@ -165,11 +177,27 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 		});
 	},<?php echo $refreshinterval; ?>);
 </script>
-<?php
+		
+	<?php
+		}
+		return;
+	} else if ($activeQuestion<0) {
+	?>
+	<h1 style='margin-top: 200px;'><?php echo $NOTACTIVE ?></h1>
+	<?php
 		return;
 	}
 	
-	if (!isset($_COOKIE[$id])) $lowest=1;  else $lowest = count($nChoices)+1;
+	if (!isset($_COOKIE[$id])) {
+		if (isset($notvoted) && $notvoted) {
+			$lowest = $activeQuestion;
+		}else {
+			$lowest=1;
+		}
+	} else {
+		$lowest = count($nChoices)+1;
+	}
+	
 	foreach ($votes as $v) {
 		if ($v[0] <= $lowest) $lowest=$v[0]+1;
 	}
@@ -211,6 +239,11 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 		} else {
 			echo '<h1>'.$VOTED.'</h1>';
 		}
+		
+		if (!$onevote) {
+			setcookie($id, "", time()-1);
+			echo "<h2><a href=''>".$VOTEAGAIN."</a></h2>";
+		}
 ?>
 	<script>
 		$("h1").hide();
@@ -221,10 +254,17 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			$("#footer").slideDown(400);
 		},600);
 		
+		<?php if (!$hideownvotes) { ?>
+		
 		var votes = <?php echo json_encode($votes) ?>;
 		for (var i=0; i<votes.length; i++) {
 			$("h1").append("<span class='label label-"+defineVars(votes[i][1])[0]+"'>"+votes[i][0]+': '+defineVars(votes[i][1])[1]+"</span>");
 		}
+		
+		<?php
+		}
+		if ($reloadactive) {
+		?>
 		
 		var active = <?php echo $activeQuestion ?>;
 		var loop = setInterval(function(){
@@ -238,8 +278,9 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 			});
 		},<?php echo $refreshinterval; ?>);
 		
-	</script>
 <?php
+		}
+	echo '</script>';
 	}
 		
 	if ($resultslink) {

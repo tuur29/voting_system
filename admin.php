@@ -2,10 +2,21 @@
 
 ob_start();
 session_start();
-include_once("options.php");
-include_once("assets/language.php");
+include_once("defaults.php");
 
-if (!isset($_SESSION["loggedin"]) || !$_SESSION["loggedin"]) { 
+function deldir($dir) {
+	foreach(glob($dir . '/*') as $file) {
+		if(is_dir($file)) rrmdir($file); else unlink($file);
+	}
+	rmdir($dir);
+}
+
+$id = '0';
+if (is_dir($folder) && file_exists($folder."/round.txt")){
+	$id = file_get_contents($folder."/round.txt",null,null,null,10);
+}
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"]!=$id) {
 
 ?>
 
@@ -20,10 +31,24 @@ if (!isset($_SESSION["loggedin"]) || !$_SESSION["loggedin"]) {
 
 if (isset($_POST['incr'])){
 	$n = intval(file_get_contents($folder."/active.txt"));
-	file_put_contents($folder."/active.txt", $n+1, LOCK_EX);
-	echo $n+1;
+	$nChoices = explode($separator, file_get_contents($folder."/round.txt",null,null,11) );
+	if ($n>=count($nChoices)) {
+		file_put_contents($folder."/active.txt", '-1', LOCK_EX);
+	}else {
+		file_put_contents($folder."/active.txt", $n+1, LOCK_EX);
+		echo $n+1;
+	}
 	return;
 }
+
+if (isset($_POST['remove'])){
+	deldir($_POST['remove']);
+	$href="results.php";
+	if ($seo) $href = strtolower($RESULTS);
+	echo "<script>window.location = './".$href."';</script>";
+	return;
+}
+
 
 ?>
 
@@ -60,7 +85,6 @@ if (isset($_POST['incr'])){
 			width: auto;
 		}
 		
-		#disableBtn { display: inline-block; }
 		.checkbox {
 			display: inline-block;
 			padding: 0 5px 7px 30px;
@@ -84,15 +108,7 @@ if (isset($_POST['incr'])){
 		
 <?php
 
-if (isset($_POST['remove'])){
-	if (is_dir($folder)){
-		if (isset($_POST['keep'])){
-			rename($folder,$_POST['keep']);
-		}
-		deldir($folder);
-	}
-
-}else if (isset($_POST['questions']) && $_POST['questions']) {
+if (isset($_POST['questions']) && $_POST['questions']) {
 
 	for ($i=0;$i<$_POST['questions'];$i++){
 		$choices[$i] = $_POST['choices'.($i+1)];
@@ -100,13 +116,19 @@ if (isset($_POST['remove'])){
 
 	if (is_dir($folder)){
 		if (isset($_POST['keep'])){
-			rename($folder,$_POST['keep']);
+			$keep = $_POST['keep'];
+			while (is_dir($keep)) {
+				$keep = $keep.'-';
+			}
+			rename($folder,$keep);
+		}else {
+			deldir($folder);
 		}
-	}else {
-		mkdir($folder);
 	}
-
-	file_put_contents($folder."/round.txt", time(), LOCK_EX);
+	
+	$id = time();
+	mkdir($folder);
+	file_put_contents($folder."/round.txt", $id, LOCK_EX);
 
 	if (isset($_POST['step'])) {
 		file_put_contents($folder."/active.txt", "0", LOCK_EX);
@@ -120,6 +142,8 @@ if (isset($_POST['remove'])){
 		file_put_contents($folder."/".($i+1).".txt", "0", LOCK_EX);
 	}
 	
+	$_SESSION['loggedin'] = $id;
+	
 	if (!isset($_GET["iframe"])) {
 		$href="results.php";
 		if ($seo) $href = strtolower($RESULTS);
@@ -129,14 +153,6 @@ if (isset($_POST['remove'])){
 	
 	echo '<div class="alert alert-success">'. $SYSTEMRESET .'</div>';
 	echo "<script>setTimeout(function() { parent.location.reload(); },750);</script>";
-}
-
-
-function deldir($dir) {
-	foreach(glob($dir . '/*') as $file) {
-		if(is_dir($file)) rrmdir($file); else unlink($file);
-	}
-	rmdir($dir);
 }
 
 ?>
@@ -185,9 +201,6 @@ function deldir($dir) {
 								}
 							?>
 						</button>
-						<?php if (is_dir($folder) && file_exists($folder."/round.txt")){ ?>
-						<button id="disableBtn" name="disable" type="submit" class="btn btn-danger"><?php echo $REMOVE ?></button>
-						<?php } ?>
 					</div>
 				</div>
 			</form>

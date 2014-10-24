@@ -26,10 +26,10 @@ if (is_dir($folder) && file_exists($folder."/round.txt")){
 	<link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
 	<link rel="shortcut icon" type="image/x-icon" href="assets/favicon.ico" />
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries-->
-    <!--[if lt IE 9]>
-    <script src="assets/html5shiv.js"></script>
-    <script src="assets/respond.min.js"></script>
-    <![endif]-->
+	<!--[if lt IE 9]>
+	<script src="assets/html5shiv.js"></script>
+	<script src="assets/respond.min.js"></script>
+	<![endif]-->
 	<style>
 		html, body { height: 100%; }
 		body { background-color: #fefefe; }
@@ -524,11 +524,13 @@ $("#popup,#admin").click(function(){
 });
 	
 $("#print a").on("mousedown",function(){
-	var w=window.open();
-	html2canvas($("#"+$(this).attr("class")), {
+	var w=window.open(), obj=$("#"+$(this).attr("class"));
+	obj.css('background','#fff');
+	html2canvas(obj, {
 		onrendered: function(canvas) {
 			var dataURL = canvas.toDataURL("image/png");
 			w.document.write('<img src="'+dataURL+'"/>');
+			obj.css('background','');
 		}
 	});
 });

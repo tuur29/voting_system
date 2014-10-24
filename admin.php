@@ -63,10 +63,10 @@ if (isset($_POST['remove'])){
 	<meta name="robots" content="noindex,nofollow" />
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries-->
-    <!--[if lt IE 9]>
-    <script src="assets/html5shiv.js"></script>
-    <script src="assets/respond.min.js"></script>
-    <![endif]-->
+	<!--[if lt IE 9]>
+	<script src="assets/html5shiv.js"></script>
+	<script src="assets/respond.min.js"></script>
+	<![endif]-->
 	<style>
 		
 		.alert, .row { margin-top: 50px; }

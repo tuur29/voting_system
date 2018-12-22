@@ -2,7 +2,7 @@ voting_system
 =============
 
 A simple system for local votings.  
-Demo: http://www.tuurlievens.net/vote
+Demo: https://www.tuurlievens.net/laboratorium/vote/results
 
 -------------
 

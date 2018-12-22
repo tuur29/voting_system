@@ -10,14 +10,14 @@ Copyright (c) 2014 Tuur Lievens
 http://www.tuurlievens.net/
 Licensed under the MIT license
 
-###HOW TO USE:
+### HOW TO USE:
 >1. Upload to server with PHP (Apache is optional, instead add ".php" to the urls in your browser)
 2. change password in "options.php" and copy and change needed settings from "defaults.php"
 3. Go to /admin(.php) and make a new round.
 4. Go to /vote or to the root folder to vote! (NL: /stem)
 5. See the results in real-time at /results (NL: /resultaten)
 
-###HOW IT WORKS:
+### HOW IT WORKS:
 When you first start the script, you will have to make a new round.
 The folder "active" is made in the script root directory. It contains a "round.txt", an "active.txt" and a file for every question.
 The "round.txt" file is the main file and contains the time when you started the round (used to check agains double votes) and the number of options per question.
@@ -36,11 +36,11 @@ Either actions support backing up the current votes by selecting "Keep round" an
 
 The default settings can be found in "defaults.php". To change them I suggest copying them to "options.php" and editing them there. "defaults.php" is meant as a fallback in case you don't edit all options. You can find explanations for each option in the comments after each option.
 
-###COMPATIBILITY & LANGUAGES
+### COMPATIBILITY & LANGUAGES
 At the moment there is 1 additonal language option available: dutch ("nl").
 You can add your own translation in "assets/language.php".
 You can vote and view the results with all browsers (yes this includes IE8)!
 
-###TODO
+### TODO
 
 - BUG: using html chars in cookie not working on old android tablets?
